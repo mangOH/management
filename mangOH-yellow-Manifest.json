@@ -1,0 +1,30 @@
+{
+    "install": [
+        {
+        }
+    ],
+    "info": {
+        "name": "mangOH-%MANGOH_BOARD%-%TARGET%",
+        "version": "%VERSION%",
+        "description": "SDK for mangOH %MANGOH_BOARD% with %TARGET%",
+        "master": true,
+        "requires": [
+            "swi-license_1.1",
+            "swi-verify-license_latest"
+        ],
+        "depends": [
+            "wp77-legato-src_%LEGATO_VERSION%(LEGATO_SRC)",
+            "mangOH-%MANGOH_BOARD%-%TARGET%-toolchain_%VERSION%-linux64(LEAF_PLATFORM_MACHINE=x86_64)(!SWI_LINUX_SRC)",
+            "wp77-modem-image_11",
+            "mangOH-%TARGET%-legato_%VERSION%(!LEGATO_SRC)",
+            "mangOH-%MANGOH_BOARD%-%TARGET%-linux-image_%VERSION%",
+            "swi-legato_latest"
+        ],
+        "tags": [
+            "mangOH",
+            "%MANGOH_BOARD%",
+            "wp77xx"
+        ],
+        "leafMinVersion": "2.0.1"
+    }
+}

@@ -1,0 +1,39 @@
+#!/bin/sh
+
+VARS_TO_REPLACE="VERSION TARGET TARGET_UPPERCASE MANGOH_BOARD LEGATO_VERSION"
+
+TARGET_UPPERCASE=$(echo "$TARGET" | tr [a-z] [A-Z])
+
+for var in $VARS_TO_REPLACE
+do
+    if ! [ "${!var}" ]
+    then
+        echo "$var not set." >&2
+        exit 1
+    else
+        echo "$var = ${!var}" >&2
+    fi
+done
+
+if ! [ -f "$1" ]
+then
+    echo "First argument should be a regular file." >&2
+    exit 1
+fi
+
+for var in $VARS_TO_REPLACE
+do
+    sed -i "s#%${var}%#${!var}#g" $1 || exit 1
+done
+
+remainders=`grep '%.*%' $1 | sed 's/^[^%]*%//' | sed 's/%[^%]*$//'`
+
+if [ "$remainders" ]
+then
+    echo "Not all variables replaced!" >&2
+    for var in $remainders
+    do
+        echo "  $var" >&2
+    done
+    exit 1
+fi

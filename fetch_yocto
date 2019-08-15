@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# Yocto toolchain and device binary image build script for mangOH with Sierra Wireless WP76.
+#
+# Copyright (C) Sierra Wireless Inc.
+
+if ! [ "$MANGOH_BOARD" ]
+then
+    echo "MANGOH_BOARD not set." >&2
+    exit 1
+fi
+
+if ! [ "$MANGOH_REF" ]
+then
+    echo "MANGOH_REF not set." >&2
+    exit 1
+fi
+
+TARGET="$1"
+
+if ! [ "$TARGET" ]
+then
+    echo "First argument should be the target device (e.g., wp76xx)." >&2
+    exit 1
+fi
+
+BUILD_DIR="$2"
+
+if ! [ -d "$BUILD_DIR" ]
+then
+    echo "Second argument should be a directory into which the sources will be fetched and built." >&2
+    exit 1
+fi
+
+# Move into the build directory
+cd $BUILD_DIR &&
+
+# Get all the sources.
+if [ "$TARGET" = "wp77xx" ]
+then
+    if ! [ "$WP77_RELEASE_VER" ]
+    then
+        echo "WP77_RELEASE_VER not set." >&2
+        exit 1
+    fi
+
+    repo init -u ssh://$USER@gerrit.legato:29418/manifest -m mdm9x06/tags/${WP77_RELEASE_VER}.xml &&
+    repo sync &&
+    git clone git@github.com:mangOH/meta-mangoh.git &&
+    git checkout ${MANGOH_REF}
+else
+    repo init -u https://github.com/mangOH/manifest.git -m mangOH/branches/${MANGOH_YOCTO_BRANCH}/${TARGET}.xml &&
+    repo sync
+fi

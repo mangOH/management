@@ -1,0 +1,20 @@
+{
+    "env": {
+        "%TARGET_UPPERCASE%_LINUX_IMAGES": "@{DIR}"
+    },
+    "info": {
+        "name": "mangOH-%MANGOH_BOARD%-%TARGET%-linux-image",
+        "version": "%VERSION%",
+        "description": "Linux Image for mangOH %MANGOH_BOARD% with %TARGET_UPPERCASE%",
+        "requires": [
+            "swi-license_1.1",
+            "swi-verify-license_latest"
+        ],
+        "tags": [
+            "mangOH",
+            "%MANGOH_BOARD%",
+            "%TARGET%"
+        ],
+        "leafMinVersion": "2.0.1"
+    }
+}

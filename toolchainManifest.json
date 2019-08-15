@@ -1,0 +1,33 @@
+{
+    "info": {
+        "name": "mangOH-%MANGOH_BOARD%-%TARGET%-toolchain",
+        "version": "%VERSION%-linux64",
+        "description": "Build toolchain for mangOH %MANGOH_BOARD% with %TARGET_UPPERCASE%",
+        "requires": [
+            "swi-license_1.1",
+            "swi-verify-license_latest"
+        ],
+        "tags": [
+            "mangOH",
+            "%MANGOH_BOARD%",
+            "%TARGET%"
+        ],
+        "leafMinVersion": "2.0.1"
+    },
+    "install": [
+        {
+            "command": [
+                "@{DIR}/toolChainExtractor.sh",
+                "-y",
+                "-d",
+                "@{DIR}/"
+            ],
+            "label": "Configuring the toolchain for your environment, this may take a few minutes..."
+        }
+    ],
+    "env": {
+        "%TARGET_UPPERCASE%_TOOLCHAIN_DIR": "@{DIR}/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi",
+        "%TARGET_UPPERCASE%_TOOLCHAIN_PREFIX": "arm-poky-linux-gnueabi-",
+        "%TARGET_UPPERCASE%_SYSROOT": "@{DIR}/sysroots/armv7a-neon-poky-linux-gnueabi"
+    }
+}
