@@ -156,11 +156,15 @@ $(LEGATO_BUILT): $(BUILD_DIR)/.legato_%_built: $(LEGATO_SOURCES_FETCHED) $(TOOLC
 $(LEGATO_SOURCES_FETCHED):
 	rm -rf $(BUILD_DIR)/legato
 	mkdir -p $(BUILD_DIR)/legato
-	cd $(BUILD_DIR)/legato && repo init -u https://github.com/mangOH/manifest.git -m legato/releases/$(LEGATO_VERSION).xml
+	cd $(BUILD_DIR)/legato && repo init -u ssh://gerrit.legato:29418/manifest.git -m legato/releases/$(LEGATO_VERSION).xml
 	cd $(BUILD_DIR)/legato && repo sync
 	# Cherry pick newer changes that we need.
+	# 49737 = size reduction by removing curl, zlib and openssl from apps.
+	# 49773 = make symlinks in the bin directory relative instead of absolute.
 	cd $(LEGATO_ROOT) && \
-		git fetch ssh://$$USER@gerrit.legato:29418/Legato refs/changes/37/49737/1 && \
+		git fetch ssh://gerrit.legato:29418/Legato refs/changes/37/49737/1 && \
+		git cherry-pick FETCH_HEAD && \
+		git fetch ssh://gerrit.legato:29418/Legato refs/changes/73/49773/1 && \
 		git cherry-pick FETCH_HEAD
 	touch $@
 

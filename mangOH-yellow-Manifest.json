@@ -13,12 +13,11 @@
             "swi-verify-license_latest"
         ],
         "depends": [
-            "wp77-legato-src_%LEGATO_VERSION%(LEGATO_SRC)",
             "mangOH-%MANGOH_BOARD%-%TARGET%-toolchain_%VERSION%-linux64(LEAF_PLATFORM_MACHINE=x86_64)(!SWI_LINUX_SRC)",
-            "wp77-modem-image_11",
             "mangOH-%TARGET%-legato_%VERSION%(!LEGATO_SRC)",
             "mangOH-%MANGOH_BOARD%-%TARGET%-linux-image_%VERSION%",
             "swi-legato_latest"
+            "wp77-legato-src_%LEGATO_VERSION%(LEGATO_SRC)",
         ],
         "tags": [
             "mangOH",
