@@ -156,7 +156,7 @@ $(LEGATO_BUILT): $(BUILD_DIR)/.legato_%_built: $(LEGATO_SOURCES_FETCHED) $(TOOLC
 $(LEGATO_SOURCES_FETCHED):
 	rm -rf $(BUILD_DIR)/legato
 	mkdir -p $(BUILD_DIR)/legato
-	cd $(BUILD_DIR)/legato && repo init -u https://github.com/mangOH/manifest.git -m legato/releases/$(LEGATO_VERSION).xml
+	cd $(BUILD_DIR)/legato && repo init -u ssh://gerrit.legato:29418/manifest.git -m legato/releases/$(LEGATO_VERSION).xml
 	cd $(BUILD_DIR)/legato && repo sync
 	# Cherry pick newer changes that we need.
 	# 49737 = size reduction by removing curl, zlib and openssl from apps.
