@@ -1,4 +1,4 @@
-# MangOH Software Configuration Management Makefile
+# mangOH Software Configuration Management Makefile
 #
 # This codifies the rules for building and tagging mangOH release candidates and releases.
 #
