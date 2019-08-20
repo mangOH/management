@@ -20,7 +20,7 @@ TARGET="$1"
 
 if ! [ "$TARGET" ]
 then
-    echo "First argument should be the target device (e.g., wp76xx)." >&2
+    echo "First argument should be the target module (e.g., wp76xx)." >&2
     exit 1
 fi
 
