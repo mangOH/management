@@ -1,7 +1,5 @@
 {
     "install": [
-        {
-        }
     ],
     "info": {
         "name": "mangOH-%MANGOH_BOARD%-%TARGET%",
