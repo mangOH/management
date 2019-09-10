@@ -43,7 +43,7 @@ TARGETS ?= wp77xx
 
 # Version of the WP77 Yocto release upon which the mangOH WP77 toolchain and linux image will
 # be based.
-export WP77_RELEASE_VER ?= SWI9X06Y_02.31.04.00
+export WP77_RELEASE_VER ?= SWI9X06Y_02.32.02.00
 
 # Manifest branch to check out for the meta-mangoh Yocto layer.
 # This is used by the fetch_yocto script when building for non-wp77 targets.
@@ -53,7 +53,7 @@ export MANGOH_YOCTO_BRANCH ?= master
 export MANGOH_REF ?= master
 
 # The release version of Legato to use.
-export LEGATO_VERSION ?= 19.04.0
+export LEGATO_VERSION ?= 19.07.0
 
 # All build artifacts will appear under here, including source code that fetched from other
 # repositories.
