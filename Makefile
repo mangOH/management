@@ -104,13 +104,13 @@ LEAF_PACKAGES = \
 				$(LINUX_LEAF_PACKAGES) \
 				$(TOP_LEVEL_LEAF_PACKAGES) \
 				$(LEGATO_BIN_LEAF_PACKAGES) \
+				$(OCTAVE_APPS_LEAF_PACKAGES) \
 
-#				$(OCTAVE_APPS_LEAF_PACKAGES) \
 #				mangOH-src
 
 LINUX_LEAF_PACKAGES = $(foreach target,$(TARGETS),$(LEAF_PACKAGE_REPO)/mangOH-$(MANGOH_BOARD)-$(target)-linux.leaf)
 TOOLCHAIN_LEAF_PACKAGES = $(foreach target,$(TARGETS),$(LEAF_PACKAGE_REPO)/mangOH-$(MANGOH_BOARD)-$(target)-toolchain.leaf)
-OCTAVE_APPS_LEAF_PACKAGES = $(foreach target,$(TARGETS),$(LEAF_PACKAGE_REPO)/mangOH-$(MANGOH_BOARD)-$(target)-octave.leaf)
+OCTAVE_APPS_LEAF_PACKAGES = $(foreach target,$(TARGETS),$(LEAF_PACKAGE_REPO)/Octave-mangOH-$(MANGOH_BOARD)-$(target).leaf)
 TOP_LEVEL_LEAF_PACKAGES = $(foreach target,$(TARGETS),$(LEAF_PACKAGE_REPO)/mangOH-$(MANGOH_BOARD)-$(target).leaf)
 LEGATO_BIN_LEAF_PACKAGES = $(foreach target,$(TARGETS),$(LEAF_PACKAGE_REPO)/mangOH-$(target)-legato.leaf)
 
@@ -242,6 +242,16 @@ $(LEGATO_BIN_LEAF_PACKAGES): $(LEAF_PACKAGE_REPO)/mangOH-%-legato.leaf:
 	cp legatoManifest.json $(LEGATO_LEAF_DIR)/manifest.json
 	VERSION=$(RELEASE_VERSION) TARGET=$* ./replaceVars $(LEGATO_LEAF_DIR)/manifest.json
 	leaf build pack -o $@ -i $(LEGATO_LEAF_DIR)
+
+# Rule for building the pre-built Octave apps leaf package.
+OCTAVE_LEAF_DIR = $(BUILD_DIR)/leaf/staging/Octave/Octave-mangOH-$(MANGOH_BOARD)-$*
+$(OCTAVE_APPS_LEAF_PACKAGES): $(LEAF_PACKAGE_REPO)/Octave-mangOH-$(MANGOH_BOARD)-%.leaf:
+	rm -rf $(OCTAVE_LEAF_DIR)
+	mkdir -p $(OCTAVE_LEAF_DIR)
+	cp $(OCTAVE_ROOT)/build/*.app $(OCTAVE_LEAF_DIR)
+	cp octaveManifest.json $(OCTAVE_LEAF_DIR)/manifest.json
+	VERSION=$(RELEASE_VERSION) TARGET=$* ./replaceVars $(OCTAVE_LEAF_DIR)/manifest.json
+	leaf build pack -o $@ -i $(OCTAVE_LEAF_DIR)
 
 # Rule for building Yocto toolchains and .cwe files.
 YOCTO_BUILD_DIR = $(BUILD_DIR)/yocto-$(MANGOH_BOARD)-$*
