@@ -10,12 +10,6 @@ then
     exit 1
 fi
 
-if ! [ "$MANGOH_REF" ]
-then
-    echo "MANGOH_REF not set." >&2
-    exit 1
-fi
-
 TARGET="$1"
 
 if ! [ "$TARGET" ]
@@ -44,11 +38,23 @@ then
         exit 1
     fi
 
+    if ! [ "$WP77_MANGOH_YOCTO_REF" ]
+    then
+        echo "WP77_MANGOH_YOCTO_REF not set." >&2
+        exit 1
+    fi
+
     repo init -u ssh://$USER@gerrit.legato:29418/manifest -m mdm9x06/tags/${WP77_RELEASE_VER}.xml &&
     repo sync &&
     git clone git@github.com:mangOH/meta-mangoh.git &&
-    git checkout ${MANGOH_REF}
+    git checkout ${WP77_MANGOH_YOCTO_REF}
 else
+    if ! [ "$MANGOH_YOCTO_BRANCH" ]
+    then
+        echo "MANGOH_YOCTO_BRANCH not set." >&2
+        exit 1
+    fi
+
     repo init -u https://github.com/mangOH/manifest.git -m mangOH/branches/${MANGOH_YOCTO_BRANCH}/${TARGET}.xml &&
     repo sync
 fi

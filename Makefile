@@ -3,7 +3,6 @@
 # This codifies the rules for building and tagging mangOH release candidates and releases.
 #
 # TODO: Add tagging.
-# TODO: Add Octave fetch commit ID or convert to using submodules.
 #
 # The primary build output is a set of leaf packages and a factory programming image (.spk) file.
 # Other artifacts built along the way include toolchains and linux images.
@@ -55,8 +54,16 @@ export MANGOH_YOCTO_BRANCH ?= master
 # Git reference to check out in the mangOH project main source repository.
 export MANGOH_REF ?= master
 
+# Git reference to check out in the meta-mangoh Yocto layer source repository when building for
+# WP77 targets.
+# This is used by the fetch_yocto script when building for the wp77xx target.
+export WP77_MANGOH_YOCTO_REF ?= master
+
 # The release version of Legato to use.
 export LEGATO_VERSION ?= 19.04.0
+
+# The reference to check out in the Octave edge package source repository.
+export OCTAVE_REF ?= master
 
 # All build artifacts will appear under here, including source code that fetched from other
 # repositories.
@@ -151,7 +158,9 @@ $(MANGOH_SPK_BUILT): $(BUILD_DIR)/.mangoh_spk_%_built: $(MANGOH_SOURCES_FETCHED)
 $(MANGOH_SOURCES_FETCHED):
 	rm -rf $(MANGOH_ROOT)
 	mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && git clone --recursive https://github.com/mangOH/mangOH
+	cd $(BUILD_DIR) && git clone https://github.com/mangOH/mangOH
+	cd $(BUILD_DIR)/mangOH && git checkout $(MANGOH_REF)
+	cd $(BUILD_DIR)/mangOH && git submodule init && git submodule update
 	touch $@
 
 # Rule for building the Legato sources.
@@ -183,9 +192,11 @@ $(OCTAVE_APPS_BUILT): $(BUILD_DIR)/.octave_apps_%_built: $(OCTAVE_SOURCES_FETCHE
 	touch $@
 
 # Rules for fetching the Octave apps source code.
-$(OCTAVE_SOURCES_FETCHED): $(LEAF_WORKSPACE_CREATED)
+$(OCTAVE_SOURCES_FETCHED):
 	rm -rf $(OCTAVE_ROOT)
-	cd $(BUILD_DIR) && git clone --recursive https://github.com/flowthings/brkedgepkg
+	cd $(BUILD_DIR) && git clone https://github.com/flowthings/brkedgepkg
+	cd $(BUILD_DIR)/brkedgepkg && git checkout $(OCTAVE_REF)
+	cd $(BUILD_DIR)/brkedgepkg && git submodule init && git submodule update
 	touch $@
 
 # All leaf package builds depend on the remote repository directory being there first.
