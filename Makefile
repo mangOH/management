@@ -178,10 +178,13 @@ $(LEGATO_SOURCES_FETCHED):
 	# Cherry pick newer changes that we need.
 	# 49737 = size reduction by removing curl, zlib and openssl from apps.
 	# 49773 = make symlinks in the bin directory relative instead of absolute.
+	# 50657 = remove excessive warning messages in syslog due to failure to open an NMEA pipe
 	cd $(LEGATO_ROOT) && \
 		git fetch ssh://gerrit.legato:29418/Legato refs/changes/37/49737/1 && \
 		git cherry-pick FETCH_HEAD && \
 		git fetch ssh://gerrit.legato:29418/Legato refs/changes/73/49773/1 && \
+		git cherry-pick FETCH_HEAD && \
+		git fetch ssh://gerrit.legato:29418/Legato refs/changes/57/50657/1 && \
 		git cherry-pick FETCH_HEAD
 	touch $@
 
