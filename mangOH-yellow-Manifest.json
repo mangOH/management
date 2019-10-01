@@ -16,7 +16,8 @@
             "mangOH-%MANGOH_BOARD%-%TARGET%-linux-image_%VERSION%",
             "swi-legato_latest",
             "wp77-legato-src_%LEGATO_VERSION%(LEGATO_SRC)",
-            "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_%VERSION%"
+            "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_%VERSION%",
+            "%MODEM_LEAF_PACKAGE%"
         ],
         "tags": [
             "mangOH",
