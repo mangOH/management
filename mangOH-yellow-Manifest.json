@@ -4,7 +4,7 @@
     "info": {
         "name": "mangOH-%MANGOH_BOARD%-%TARGET%",
         "version": "%VERSION%",
-        "description": "SDK for mangOH %MANGOH_BOARD% with %TARGET%",
+        "description": "SDK for mangOH %MANGOH_BOARD% with %TARGET%, based on Legato version %LEGATO_VERSION% and %TARGET% release %MODEM_RELEASE_VERSION%",
         "master": true,
         "requires": [
             "swi-license_1.1",
@@ -12,17 +12,17 @@
         ],
         "depends": [
             "mangOH-%MANGOH_BOARD%-%TARGET%-toolchain_%VERSION%-linux64(LEAF_PLATFORM_MACHINE=x86_64)(!SWI_LINUX_SRC)",
-            "mangOH-%TARGET%-legato_%VERSION%(!LEGATO_SRC)",
+            "mangOH-%TARGET%-legato_%VERSION%",
             "mangOH-%MANGOH_BOARD%-%TARGET%-linux-image_%VERSION%",
-            "swi-legato_latest",
-            "wp77-legato-src_%LEGATO_VERSION%(LEGATO_SRC)",
             "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_%VERSION%",
-            "%MODEM_LEAF_PACKAGE%"
+            "%MODEM_LEAF_PACKAGE%",
+            "swi-legato_latest"
         ],
         "tags": [
             "mangOH",
             "%MANGOH_BOARD%",
-            "wp77xx"
+            "wp77xx",
+            "Octave"
         ],
         "leafMinVersion": "2.0.1"
     }
