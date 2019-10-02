@@ -279,14 +279,11 @@ $(LEGATO_BIN_LEAF_PACKAGES): $(LEAF_PACKAGE_REPO)/mangOH-%-legato.leaf:
 	leaf build pack -o $@ -i $(LEGATO_LEAF_DIR)
 
 # Rule for building the pre-built Octave apps leaf package.
-OCTAVE_LEAF_DIR = $(BUILD_DIR)/leaf/staging/Octave/Octave-mangOH-$(MANGOH_BOARD)-$*
-$(OCTAVE_APPS_LEAF_PACKAGES): $(LEAF_PACKAGE_REPO)/Octave-mangOH-$(MANGOH_BOARD)-%.leaf:
-	rm -rf $(OCTAVE_LEAF_DIR)
-	mkdir -p $(OCTAVE_LEAF_DIR)
-	cp $(OCTAVE_ROOT)/build/*.app $(OCTAVE_LEAF_DIR)
-	cp octaveManifest.json $(OCTAVE_LEAF_DIR)/manifest.json
-	VERSION=$(RELEASE_VERSION) TARGET=$* ./replaceVars $(OCTAVE_LEAF_DIR)/manifest.json
-	leaf build pack -o $@ -i $(OCTAVE_LEAF_DIR)
+OCTAVE_BUILD_DIR = $(OCTAVE_ROOT)/build
+OCTAVE_LEAF_FILE_NAME = $(shell dirname $@)
+$(OCTAVE_APPS_LEAF_PACKAGES): $(LEAF_PACKAGE_REPO)/%:
+	cp $(OCTAVE_BUILD_DIR)/$* $@
+	cp $(OCTAVE_BUILD_DIR)/$*.info $@.info
 
 # Rule for building Yocto toolchains and .cwe files.
 YOCTO_BUILD_DIR = $(BUILD_DIR)/yocto-$(MANGOH_BOARD)-$*
