@@ -165,9 +165,9 @@ $(MANGOH_SPK_BUILT): $(BUILD_DIR)/.mangoh_spk_%_built: $(MANGOH_SOURCES_FETCHED)
 $(MANGOH_SOURCES_FETCHED):
 	rm -rf $(MANGOH_ROOT)
 	mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && git clone https://github.com/mangOH/mangOH
-	cd $(BUILD_DIR)/mangOH && git checkout $(MANGOH_REF)
-	cd $(BUILD_DIR)/mangOH && git submodule init && git submodule update
+	git clone https://github.com/mangOH/mangOH $(MANGOH_ROOT)
+	cd $(MANGOH_ROOT) && git checkout $(MANGOH_REF)
+	cd $(MANGOH_ROOT) && git submodule init && git submodule update
 	touch $@
 
 # Rule for building the Legato sources.
@@ -211,9 +211,9 @@ $(OCTAVE_APPS_BUILT): $(BUILD_DIR)/.octave_apps_%_built: $(OCTAVE_SOURCES_FETCHE
 # Unfortunately, this can only be done by someone inside Sierra Wireless. :(
 $(OCTAVE_SOURCES_FETCHED):
 	rm -rf $(OCTAVE_ROOT)
-	cd $(BUILD_DIR) && git clone https://github.com/flowthings/brkedgepkg
-	cd $(BUILD_DIR)/brkedgepkg && git checkout $(OCTAVE_REF)
-	cd $(BUILD_DIR)/brkedgepkg && git submodule init && git submodule update
+	git clone https://github.com/flowthings/brkedgepkg $(OCTAVE_ROOT)
+	cd $(OCTAVE_ROOT) && git checkout $(OCTAVE_REF)
+	cd $(OCTAVE_ROOT) && git submodule init && git submodule update
 	touch $@
 
 # Rules for fetching the modem firmware.
