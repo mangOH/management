@@ -32,9 +32,9 @@ cd $BUILD_DIR &&
 # Get all the sources.
 if [ "$TARGET" = "wp77xx" ]
 then
-    if ! [ "$WP77_RELEASE_VER" ]
+    if ! [ "$WP77_YOCTO_VER" ]
     then
-        echo "WP77_RELEASE_VER not set." >&2
+        echo "WP77_YOCTO_VER not set." >&2
         exit 1
     fi
 
@@ -44,10 +44,12 @@ then
         exit 1
     fi
 
-    repo init -u ssh://$USER@gerrit.legato:29418/manifest -m mdm9x06/tags/${WP77_RELEASE_VER}.xml &&
+    repo init -u ssh://$USER@gerrit.legato:29418/manifest -m mdm9x06/tags/${WP77_YOCTO_VER}.xml &&
     repo sync &&
     git clone git@github.com:mangOH/meta-mangoh.git &&
-    git checkout ${WP77_MANGOH_YOCTO_REF}
+    cd meta-mangoh &&
+    git checkout ${WP77_MANGOH_YOCTO_REF} &&
+    cd ..
 else
     if ! [ "$MANGOH_YOCTO_BRANCH" ]
     then

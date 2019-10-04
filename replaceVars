@@ -1,6 +1,8 @@
 #!/bin/bash
 
-VARS_TO_REPLACE="VERSION TARGET TARGET_UPPERCASE MANGOH_BOARD LEGATO_VERSION"
+# Generate a list of all variables in the file that need replacing.
+# Variables to be replaced are surrounded by '%' characters, like "%TARGET%".
+VARS_TO_REPLACE=`grep '%.*%' $1 | sed -E 's/(^[^%]*%)|(%[^%]*$)//g' | sed 's/%[^%]*%/\n/g' | sort -u`
 
 TARGET_UPPERCASE=$(echo "$TARGET" | tr [a-z] [A-Z])
 
@@ -8,7 +10,7 @@ for var in $VARS_TO_REPLACE
 do
     if ! [ "${!var}" ]
     then
-        echo "$var not set." >&2
+        echo "$var is either not set or empty." >&2
         exit 1
     else
         echo "$var = ${!var}" >&2
@@ -25,15 +27,3 @@ for var in $VARS_TO_REPLACE
 do
     sed -i "s#%${var}%#${!var}#g" $1 || exit 1
 done
-
-remainders=`grep '%.*%' $1 | sed 's/^[^%]*%//' | sed 's/%[^%]*$//'`
-
-if [ "$remainders" ]
-then
-    echo "Not all variables replaced!" >&2
-    for var in $remainders
-    do
-        echo "  $var" >&2
-    done
-    exit 1
-fi
