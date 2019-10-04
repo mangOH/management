@@ -7,14 +7,14 @@
         "description": "SDK for mangOH %MANGOH_BOARD% with %TARGET%, based on Legato version %LEGATO_VERSION% and %TARGET% release %MODEM_RELEASE_VERSION%",
         "master": true,
         "requires": [
-            "swi-license_1.1",
+            "swi-license_1.2",
             "swi-verify-license_latest"
         ],
         "depends": [
             "mangOH-%MANGOH_BOARD%-%TARGET%-toolchain_%VERSION%-linux64(LEAF_PLATFORM_MACHINE=x86_64)(!SWI_LINUX_SRC)",
             "mangOH-%TARGET%-legato_%VERSION%",
             "mangOH-%MANGOH_BOARD%-%TARGET%-linux-image_%VERSION%",
-            "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_%VERSION%",
+            "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_mangOH-rel-%VERSION%-unofficial",
             "%MODEM_LEAF_PACKAGE%",
             "swi-legato_latest"
         ],

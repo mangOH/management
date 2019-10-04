@@ -204,7 +204,7 @@ $(LEGATO_SOURCES_FETCHED):
 $(OCTAVE_APPS_BUILT): $(BUILD_DIR)/.octave_apps_%_built: $(OCTAVE_SOURCES_FETCHED) $(LEGATO_BUILT)
 	cd $(BUILD_DIR)/brkedgepkg && \
 		source $(LEGATO_ROOT)/build/$*/config.sh && \
-		make DHUB_ROOT=$(MANGOH_ROOT)/apps/DataHub LEGATO_TARGET=$* PATH=$(PATH):$(LEGATO_ROOT)/bin
+		make DHUB_ROOT=$(MANGOH_ROOT)/apps/DataHub LEGATO_TARGET=$* PATH=$(PATH):$(LEGATO_ROOT)/bin VERSION=mangOH-rel-$(RELEASE_VERSION)-unofficial
 	touch $@
 
 # Rules for fetching the Octave apps source code.
