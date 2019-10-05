@@ -49,7 +49,7 @@ export MANGOH_REF ?= master
 # Git reference to check out in the meta-mangoh Yocto layer source repository when building for
 # WP77 targets.
 # This is used by the fetch_yocto script when building for the wp77xx target.
-export WP77XX_MANGOH_YOCTO_REF ?= master
+export WP77_MANGOH_YOCTO_REF ?= master
 
 # Modem firmware release version number.
 wp76xx_MODEM_RELEASE_VERSION ?= 13.2
