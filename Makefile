@@ -219,7 +219,7 @@ $(OCTAVE_SOURCES_FETCHED):
 # Rules for fetching the modem firmware.
 # NOTE: This uses leaf to install the leaf package under $(LEAF_USER_ROOT).
 $(MODEM_FIRMWARE_FETCHED): $(BUILD_DIR)/.%_modem_firmware_fetched: leaf_sandbox
-	leaf package install $($*_MODEM_LEAF_PACKAGE)
+	yes | leaf package install $($*_MODEM_LEAF_PACKAGE)
 
 # All leaf package builds depend on the remote repository directory being there first.
 $(LEAF_PACKAGES): $(LEAF_PACKAGE_REPO)
