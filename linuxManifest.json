@@ -7,7 +7,7 @@
         "version": "%VERSION%",
         "description": "Linux Image for mangOH %MANGOH_BOARD% with %TARGET_UPPERCASE%",
         "requires": [
-            "swi-license_1.1",
+            "swi-license_1.2",
             "swi-verify-license_latest"
         ],
         "tags": [

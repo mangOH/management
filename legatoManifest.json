@@ -13,7 +13,7 @@
         "version": "%VERSION%",
         "description": "Legato Framework built for mangOH and WP77 (%LEGATO_VERSION%)",
         "requires": [
-            "swi-license_1.1",
+            "swi-license_1.2",
             "swi-verify-license_latest",
             "swi-aptdeps-legato_1.0",
             "swi-verify-aptdeps_latest"
