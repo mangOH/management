@@ -30,33 +30,11 @@ fi
 cd $BUILD_DIR &&
 
 # Get all the sources.
-if [ "$TARGET" = "wp77xx" ]
+if ! [ "$MANGOH_YOCTO_BRANCH" ]
 then
-    if ! [ "$WP77_YOCTO_VER" ]
-    then
-        echo "WP77_YOCTO_VER not set." >&2
-        exit 1
-    fi
-
-    if ! [ "$WP77_MANGOH_YOCTO_REF" ]
-    then
-        echo "WP77_MANGOH_YOCTO_REF not set." >&2
-        exit 1
-    fi
-
-    repo init -u ssh://$USER@gerrit.legato:29418/manifest -m mdm9x06/tags/${WP77_YOCTO_VER}.xml &&
-    repo sync &&
-    git clone git@github.com:mangOH/meta-mangoh.git &&
-    cd meta-mangoh &&
-    git checkout ${WP77_MANGOH_YOCTO_REF} &&
-    cd ..
-else
-    if ! [ "$MANGOH_YOCTO_BRANCH" ]
-    then
-        echo "MANGOH_YOCTO_BRANCH not set." >&2
-        exit 1
-    fi
-
-    repo init -u https://github.com/mangOH/manifest.git -m mangOH/branches/${MANGOH_YOCTO_BRANCH}/${TARGET}.xml &&
-    repo sync
+    echo "MANGOH_YOCTO_BRANCH not set." >&2
+    exit 1
 fi
+
+repo init -u https://github.com/mangOH/manifest.git -m mangOH/branches/${MANGOH_YOCTO_BRANCH}/${TARGET}.xml &&
+repo sync

@@ -3,6 +3,10 @@
 # This codifies the rules for building and tagging mangOH release candidates and releases.
 #
 # TODO: Add tagging.
+# TODO: Do we need to fetch Legato sources separately? The correct version of Legato should already
+#       be referenced by the manifest in the mangOH manifest repository.
+# TODO: Automate Octave tag resolution or better yet, get Octave to tag the repository with their
+#       apps in it.
 #
 # The primary build output is a set of leaf packages and a factory programming image (.spk) file.
 # Other artifacts built along the way include toolchains and linux images.
@@ -34,11 +38,6 @@ endif
 #TARGETS ?= wp76xx wp77xx
 TARGETS ?= wp77xx
 
-# Version of the WP77 Yocto release upon which the mangOH WP77 toolchain and linux image will
-# be based.
-# This is used by the fetch_yocto script when building for the wp77xx target.
-export WP77_YOCTO_VER ?= SWI9X06Y_02.32.02.00
-
 # Manifest branch to check out for the meta-mangoh Yocto layer.
 # This is used by the fetch_yocto script when building for non-wp77 targets.
 export MANGOH_YOCTO_BRANCH ?= master
@@ -46,13 +45,8 @@ export MANGOH_YOCTO_BRANCH ?= master
 # Git reference to check out in the mangOH project main source repository.
 export MANGOH_REF ?= master
 
-# Git reference to check out in the meta-mangoh Yocto layer source repository when building for
-# WP77 targets.
-# This is used by the fetch_yocto script when building for the wp77xx target.
-export WP77_MANGOH_YOCTO_REF ?= master
-
 # Modem firmware release version number.
-wp76xx_MODEM_RELEASE_VERSION ?= 13.2
+wp76xx_MODEM_RELEASE_VERSION ?= 13.3
 wp77xx_MODEM_RELEASE_VERSION ?= 12
 
 # The leaf package identifier for the package containing the modem firmware image.
@@ -60,10 +54,15 @@ wp76xx_MODEM_LEAF_PACKAGE ?= wp76-modem-image_$(wp76xx_MODEM_RELEASE_VERSION)
 wp77xx_MODEM_LEAF_PACKAGE ?= wp77-modem-image_$(wp77xx_MODEM_RELEASE_VERSION)
 
 # The release version of Legato to use.
-export LEGATO_VERSION ?= 19.07.0
+export LEGATO_VERSION ?= 19.10.0
 
 # The reference to check out in the Octave edge package source repository.
-export OCTAVE_REF ?= master
+# Octave tag their fork of the mangOH repository, not their brkedge repo, so do this:
+# $ git clone https://github.com/flowthings/mangOH.git /tmp/mangOH_Octave
+# $ pushd /tmp/mangOH_Octave
+# $ git ls-tree [OCTAVE_TAG] apps/Brooklyn | cut -d " " -f 3 | cut -f 1
+# $ popd
+export OCTAVE_REF ?= 05581a35321158d4a701fcf04c83b4d44c32cfcc
 
 # All build artifacts will appear under here, including source code that fetched from other
 # repositories.
@@ -183,20 +182,12 @@ $(LEGATO_SOURCES_FETCHED):
 	cd $(BUILD_DIR)/legato && repo sync
 	# Cherry pick newer changes that we need.
 	# 49737 = size reduction by removing curl, zlib and openssl from apps.
-	# 49773 = make symlinks in the bin directory relative instead of absolute.
-	# 50657 = remove excessive warning messages in syslog due to failure to open an NMEA pipe
-	# 50868 and 50869 = fix memory leak and permanently busy state in COAP layer needed by Octave.
+	# 52948 = Do not call chmod on WiFi PA in pa_wifiAp_Init()
 	cd $(LEGATO_ROOT) && \
 		git fetch ssh://gerrit.legato:29418/Legato refs/changes/37/49737/1 && \
 		git cherry-pick FETCH_HEAD && \
-		git fetch ssh://gerrit.legato:29418/Legato refs/changes/73/49773/1 && \
-		git cherry-pick FETCH_HEAD && \
-		git fetch ssh://gerrit.legato:29418/Legato refs/changes/57/50657/1 && \
-		git cherry-pick FETCH_HEAD && \
-		git fetch ssh://gerrit.legato:29418/Legato refs/changes/68/50868/5 && \
-		git cherry-pick FETCH_HEAD && \
-		cd apps/platformServices/airVantageConnector && \
-		git fetch ssh://gerrit.legato:29418/Legato/Service/AirVantageConnector refs/changes/69/50869/9 && \
+		cd modules/WiFi && \
+		git fetch ssh://gerrit.legato:29418/Legato/WiFi refs/changes/48/52948/3 && \
 		git cherry-pick FETCH_HEAD
 	touch $@
 
