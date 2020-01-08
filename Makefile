@@ -166,7 +166,7 @@ $(MANGOH_SOURCES_FETCHED):
 	mkdir -p $(BUILD_DIR)
 	git clone https://github.com/mangOH/mangOH $(MANGOH_ROOT)
 	cd $(MANGOH_ROOT) && git checkout $(MANGOH_REF)
-	cd $(MANGOH_ROOT) && git submodule init && git submodule update
+	cd $(MANGOH_ROOT) && git submodule update --init --recursive
 	touch $@
 
 # Rule for building the Legato sources.
@@ -204,7 +204,7 @@ $(OCTAVE_SOURCES_FETCHED):
 	rm -rf $(OCTAVE_ROOT)
 	git clone https://github.com/flowthings/brkedgepkg $(OCTAVE_ROOT)
 	cd $(OCTAVE_ROOT) && git checkout $(OCTAVE_REF)
-	cd $(OCTAVE_ROOT) && git submodule init && git submodule update
+	cd $(OCTAVE_ROOT) && git submodule update --init --recursive
 	touch $@
 
 # Rules for fetching the modem firmware.
