@@ -54,7 +54,7 @@ wp76xx_MODEM_LEAF_PACKAGE ?= wp76-modem-image_$(wp76xx_MODEM_RELEASE_VERSION)
 wp77xx_MODEM_LEAF_PACKAGE ?= wp77-modem-image_$(wp77xx_MODEM_RELEASE_VERSION)
 
 # The release version of Legato to use.
-export LEGATO_VERSION ?= 19.10.0
+export LEGATO_VERSION ?= 19.10.1
 
 # The reference to check out in the Octave edge package source repository.
 # Octave tag their fork of the mangOH repository, not their brkedge repo, so do this:
@@ -62,7 +62,14 @@ export LEGATO_VERSION ?= 19.10.0
 # $ pushd /tmp/mangOH_Octave
 # $ git ls-tree [OCTAVE_TAG] apps/Brooklyn | cut -d " " -f 3 | cut -f 1
 # $ popd
-export OCTAVE_REF ?= 05581a35321158d4a701fcf04c83b4d44c32cfcc
+#
+# NOTE: There were some issues with the brkedgepkg Makefile in 2.1.1, so 3 changes were
+# cherry-picked for this release:
+# - Makefile: build cloudInterface with meaningful VERSIONTAG
+# - Makefile: add rule to build diagnostic.adef
+# - Makefile: include virtual in util's interface-search path
+export OCTAVE_REF ?= ce4a5d3902670eed2465ce8c75918d3b1fe5bbea
+OCTAVE_VERSION = 2.1.1-mangOH-0
 
 # All build artifacts will appear under here, including source code that fetched from other
 # repositories.
@@ -195,7 +202,7 @@ $(LEGATO_SOURCES_FETCHED):
 $(OCTAVE_APPS_BUILT): $(BUILD_DIR)/.octave_apps_%_built: $(OCTAVE_SOURCES_FETCHED) $(LEGATO_BUILT)
 	cd $(BUILD_DIR)/brkedgepkg && \
 		source $(LEGATO_ROOT)/build/$*/config.sh && \
-		make DHUB_ROOT=$(MANGOH_ROOT)/apps/DataHub LEGATO_TARGET=$* PATH=$(PATH):$(LEGATO_ROOT)/bin VERSION=mangOH-rel-$(RELEASE_VERSION)-unofficial
+		make DHUB_ROOT=$(MANGOH_ROOT)/apps/DataHub LEGATO_TARGET=$* PATH=$(PATH):$(LEGATO_ROOT)/bin VERSION=$(OCTAVE_VERSION)
 	touch $@
 
 # Rules for fetching the Octave apps source code.
