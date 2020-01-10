@@ -14,7 +14,7 @@
             "mangOH-%MANGOH_BOARD%-%TARGET%-toolchain_%VERSION%-linux64(LEAF_PLATFORM_MACHINE=x86_64)(!SWI_LINUX_SRC)",
             "mangOH-%TARGET%-legato_%VERSION%",
             "mangOH-%MANGOH_BOARD%-%TARGET%-linux-image_%VERSION%",
-            "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_mangOH-rel-%VERSION%-unofficial",
+            "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_%OCTAVE_VERSION%",
             "%MODEM_LEAF_PACKAGE%",
             "swi-legato_latest"
         ],

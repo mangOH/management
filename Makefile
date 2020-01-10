@@ -156,11 +156,23 @@ $(LEAF_REMOTE_BUILT): $(LEAF_PACKAGES)
 
 # Rule for generating the factory .spk file.
 $(MANGOH_SPK_BUILT): $(BUILD_DIR)/.mangoh_spk_%_built: $(MANGOH_SOURCES_FETCHED) $(OCTAVE_APPS_BUILT) $(LEGATO_BUILT) $(MODEM_FIRMWARE_FETCHED)
+	# With Octave
 	cd $(MANGOH_ROOT) && \
 		source $(LEGATO_ROOT)/build/$*/config.sh && \
 		$(MAKE) $(MANGOH_BOARD)_spk \
 			LEGATO_TARGET=$* \
 			OCTAVE_ROOT=$(OCTAVE_ROOT)/build \
+			BOOTLOADER_IMAGE=$(BUILD_DIR)/yocto-$(MANGOH_BOARD)-$*/build_bin/tmp/deploy/images/swi-mdm9x28-wp/appsboot_rw_$*.cwe \
+			LINUX_IMAGE=$(BUILD_DIR)/yocto-$(MANGOH_BOARD)-$*/build_bin/tmp/deploy/images/swi-mdm9x28-wp/yocto_$*.4k.cwe \
+			MODEM_FIRMWARE=$(wildcard $(LEAF_USER_ROOT)/$($*_MODEM_LEAF_PACKAGE)/*SIERRA*)
+	cp $(MANGOH_ROOT)/build/$(MANGOH_BOARD)_$*.spk $(BUILD_DIR)/$(MANGOH_BOARD)_$*_$(RELEASE_VERSION)-octave.spk
+	# Without Octave
+	cd $(MANGOH_ROOT) && \
+		make clean && \
+		source $(LEGATO_ROOT)/build/$*/config.sh && \
+		$(MAKE) $(MANGOH_BOARD)_spk \
+			LEGATO_TARGET=$* \
+			OCTAVE=0 \
 			BOOTLOADER_IMAGE=$(BUILD_DIR)/yocto-$(MANGOH_BOARD)-$*/build_bin/tmp/deploy/images/swi-mdm9x28-wp/appsboot_rw_$*.cwe \
 			LINUX_IMAGE=$(BUILD_DIR)/yocto-$(MANGOH_BOARD)-$*/build_bin/tmp/deploy/images/swi-mdm9x28-wp/yocto_$*.4k.cwe \
 			MODEM_FIRMWARE=$(wildcard $(LEAF_USER_ROOT)/$($*_MODEM_LEAF_PACKAGE)/*SIERRA*)
@@ -260,8 +272,11 @@ $(TOP_LEVEL_LEAF_PACKAGES): $(LEAF_PACKAGE_REPO)/mangOH-$(MANGOH_BOARD)-%.leaf:
 	rm -rf $(MASTER_LEAF_DIR)
 	mkdir -p $(MASTER_LEAF_DIR)
 	cp mangOH-$(MANGOH_BOARD)-Manifest.json $(MASTER_LEAF_DIR)/manifest.json
-	VERSION=$(RELEASE_VERSION) TARGET=$* \
-		MODEM_LEAF_PACKAGE=$($*_MODEM_LEAF_PACKAGE) MODEM_RELEASE_VERSION=$($*_MODEM_RELEASE_VERSION) \
+	VERSION=$(RELEASE_VERSION) \
+		TARGET=$* \
+		OCTAVE_VERSION=$(OCTAVE_VERSION) \
+		MODEM_LEAF_PACKAGE=$($*_MODEM_LEAF_PACKAGE) \
+		MODEM_RELEASE_VERSION=$($*_MODEM_RELEASE_VERSION) \
 		./replaceVars $(MASTER_LEAF_DIR)/manifest.json
 	leaf build pack -o $@ -i $(MASTER_LEAF_DIR)
 
