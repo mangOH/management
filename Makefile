@@ -54,7 +54,7 @@ wp76xx_MODEM_LEAF_PACKAGE ?= wp76-modem-image_$(wp76xx_MODEM_RELEASE_VERSION)
 wp77xx_MODEM_LEAF_PACKAGE ?= wp77-modem-image_$(wp77xx_MODEM_RELEASE_VERSION)
 
 # The release version of Legato to use.
-export LEGATO_VERSION ?= 19.10.1
+export LEGATO_VERSION ?= 19.11.0
 
 # The reference to check out in the Octave edge package source repository.
 # Octave tag their fork of the mangOH repository, not their brkedge repo, so do this:
@@ -68,8 +68,8 @@ export LEGATO_VERSION ?= 19.10.1
 # - Makefile: build cloudInterface with meaningful VERSIONTAG
 # - Makefile: add rule to build diagnostic.adef
 # - Makefile: include virtual in util's interface-search path
-export OCTAVE_REF ?= ce4a5d3902670eed2465ce8c75918d3b1fe5bbea
-OCTAVE_VERSION = 2.1.1-mangOH-0
+export OCTAVE_REF ?= f0e51d7b9db04b3ee6e62a8d5d113866f0ef757f
+OCTAVE_VERSION = 2.1.2-mangOH-0
 
 # All build artifacts will appear under here, including source code that fetched from other
 # repositories.
@@ -200,11 +200,8 @@ $(LEGATO_SOURCES_FETCHED):
 	cd $(BUILD_DIR)/legato && repo init -u ssh://gerrit.legato:29418/manifest.git -m legato/releases/$(LEGATO_VERSION).xml
 	cd $(BUILD_DIR)/legato && repo sync
 	# Cherry pick newer changes that we need.
-	# 49737 = size reduction by removing curl, zlib and openssl from apps.
 	# 52948 = Do not call chmod on WiFi PA in pa_wifiAp_Init()
 	cd $(LEGATO_ROOT) && \
-		git fetch ssh://gerrit.legato:29418/Legato refs/changes/37/49737/1 && \
-		git cherry-pick FETCH_HEAD && \
 		cd modules/WiFi && \
 		git fetch ssh://gerrit.legato:29418/Legato/WiFi refs/changes/48/52948/3 && \
 		git cherry-pick FETCH_HEAD
