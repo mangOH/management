@@ -200,6 +200,13 @@ $(LEGATO_SOURCES_FETCHED):
 	cd $(BUILD_DIR)/legato && repo init -u ssh://gerrit.legato:29418/manifest.git -m legato/releases/$(LEGATO_VERSION).xml
 	cd $(BUILD_DIR)/legato && repo sync
 	# Cherry pick newer changes that we need.
+
+	# LE-13900: coap blockwise transfer
+	cd $(LEGATO_ROOT) && git cherry-pick 4495a3fcbd1c6e40ee7d2aa9ec9870c43ac43f87
+	cd $(LEGATO_ROOT)/3rdParty/Lwm2mCore && git cherry-pick cdf606b38cdb48674569cba8a86397d609440469
+	cd $(LEGATO_ROOT)/apps/platformServices/airVantageConnector && git cherry-pick 2f85cfa9e8d3c01a8d02d2b5434a3c33c5f0f296
+	cd $(LEGATO_ROOT)/3rdParty/Lwm2mCore/3rdParty/wakaama && git cherry-pick 19cc4c568e9b61e38c8dfbc241a7e9761b1f19e0
+
 	# 52948 = Do not call chmod on WiFi PA in pa_wifiAp_Init()
 	cd $(LEGATO_ROOT) && \
 		cd modules/WiFi && \
