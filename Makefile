@@ -35,8 +35,8 @@ ifneq ($(MAKECMDGOALS),clean)
 
 endif
 
-#TARGETS ?= wp76xx wp77xx
 TARGETS ?= wp77xx
+#TARGETS ?= wp76xx wp77xx
 
 # Manifest branch to check out for the meta-mangoh Yocto layer.
 # This is used by the fetch_yocto script when building for non-wp77 targets.
@@ -54,7 +54,7 @@ wp76xx_MODEM_LEAF_PACKAGE ?= wp76-modem-image_$(wp76xx_MODEM_RELEASE_VERSION)
 wp77xx_MODEM_LEAF_PACKAGE ?= wp77-modem-image_$(wp77xx_MODEM_RELEASE_VERSION)
 
 # The release version of Legato to use.
-export LEGATO_VERSION ?= 19.11.0
+export LEGATO_VERSION ?= 20.04.0
 
 # The reference to check out in the Octave edge package source repository.
 # Octave tag their fork of the mangOH repository, not their brkedge repo, so do this:
@@ -63,13 +63,8 @@ export LEGATO_VERSION ?= 19.11.0
 # $ git ls-tree [OCTAVE_TAG] apps/Brooklyn | cut -d " " -f 3 | cut -f 1
 # $ popd
 #
-# NOTE: There were some issues with the brkedgepkg Makefile in 2.1.1, so 3 changes were
-# cherry-picked for this release:
-# - Makefile: build cloudInterface with meaningful VERSIONTAG
-# - Makefile: add rule to build diagnostic.adef
-# - Makefile: include virtual in util's interface-search path
-export OCTAVE_REF ?= f0e51d7b9db04b3ee6e62a8d5d113866f0ef757f
-OCTAVE_VERSION = 2.1.2-mangOH-0
+export OCTAVE_REF ?= f8ca3f7b19317f270a504a94708c29d4eab0c443
+OCTAVE_VERSION = 3.0.0-pre23April2020-mangOH-0
 
 # All build artifacts will appear under here, including source code that fetched from other
 # repositories.
@@ -201,16 +196,22 @@ $(LEGATO_SOURCES_FETCHED):
 	cd $(BUILD_DIR)/legato && repo sync
 	# Cherry pick newer changes that we need.
 
-	# LE-13900: coap blockwise transfer
-	cd $(LEGATO_ROOT) && git cherry-pick 4495a3fcbd1c6e40ee7d2aa9ec9870c43ac43f87
-	cd $(LEGATO_ROOT)/3rdParty/Lwm2mCore && git cherry-pick cdf606b38cdb48674569cba8a86397d609440469
-	cd $(LEGATO_ROOT)/apps/platformServices/airVantageConnector && git cherry-pick 2f85cfa9e8d3c01a8d02d2b5434a3c33c5f0f296
-	cd $(LEGATO_ROOT)/3rdParty/Lwm2mCore/3rdParty/wakaama && git cherry-pick 19cc4c568e9b61e38c8dfbc241a7e9761b1f19e0
-
-	# 52948 = Do not call chmod on WiFi PA in pa_wifiAp_Init()
-	cd $(LEGATO_ROOT) && \
-		cd modules/WiFi && \
-		git fetch ssh://gerrit.legato:29418/Legato/WiFi refs/changes/48/52948/3 && \
+	# LE-14509: [AVC] Incorrect fd closure order during disconnection from the AV server
+	cd $(LEGATO_ROOT)/apps/platformServices/airVantageConnector && \
+		git cherry-pick 3998b243fb0426e3ae667d3e7dd3d535b3b4154a
+	# LE-14639: [Octave][CoAP]AV does not reply to CoAP retry on CoAP data for application
+	cd $(LEGATO_ROOT)/3rdParty/Lwm2mCore && \
+		git fetch ssh://gerrit.legato:29418/lwm2mCore refs/changes/62/60162/1 && \
+		git cherry-pick FETCH_HEAD
+	cd $(LEGATO_ROOT)/3rdParty/Lwm2mCore/3rdParty/wakaama && \
+		git fetch ssh://gerrit.legato:29418/external/eclipse/wakaama refs/changes/63/60163/1 && \
+		git cherry-pick FETCH_HEAD
+	# LE-14672: [AVC][LwM2M] Server initiated is not working
+	cd $(LEGATO_ROOT)/3rdParty/Lwm2mCore && \
+		git fetch ssh://gerrit.legato:29418/lwm2mCore refs/changes/38/60738/2 && \
+		git cherry-pick FETCH_HEAD
+	cd $(LEGATO_ROOT)/3rdParty/Lwm2mCore/3rdParty/tinydtls && \
+		git fetch ssh://gerrit.legato:29418/external/eclipse/tinydtls refs/changes/39/60739/1 && \
 		git cherry-pick FETCH_HEAD
 	touch $@
 
