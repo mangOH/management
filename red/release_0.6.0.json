@@ -1,0 +1,33 @@
+{
+    "octave_git_ref": "f8ca3f7b19317f270a504a94708c29d4eab0c443",
+    "mangoh_git_ref": "origin/master",
+    "octave_version": "3.0.0-pre23April2020-mangOH-0",
+    "legato_version": "20.04.0",
+    "mangoh_version": "0.6.0",
+    "modules": [
+        {
+            "legato_target": "wp85",
+            "casual_target": "wp85",
+            "master_package_version": "3.14.0",
+            "firmware": "R17"
+        },
+        {
+            "legato_target": "wp750x",
+            "casual_target": "wp75",
+            "master_package_version": "3.14.0",
+            "firmware": "R17"
+        },
+        {
+            "legato_target": "wp76xx",
+            "casual_target": "wp76",
+            "master_package_version": "4.7.0",
+            "firmware": "R13.3"
+        },
+        {
+            "legato_target": "wp77xx",
+            "casual_target": "wp77",
+            "master_package_version": "3.4.0",
+            "firmware": "R12"
+        }
+    ]
+}
