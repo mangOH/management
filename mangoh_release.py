@@ -5,208 +5,6 @@
 # in another file. The path to that file is passed as the first (and only) argument
 # to this script.
 #
-# = Manifest Format +
-#
-# The specification format is a JSON object.  Each subsection below describes a member of
-# that object.
-#
-# == mangoh ==
-#
-# Specifies details of the mangOH release.
-#
-# "mangoh": {
-#     "version": "0.7.0-beta01",
-#     "ref": "646592902e6d5d748560a60da7e3db0c0f57b360",
-#     "wget": [
-#         {
-#             "url": "https://community.bosch-sensortec.com/varuj77995/attachments/varuj77995/bst_community-mems-forum/44/1/BSEC_1.4.7.2_GCC_CortexA7_20190225.zip",
-#             "dir": "components/boschBsec",
-#             "unpack": "unzip"
-#         }
-#     ],
-#     "requires": [
-#         "swi-license_1.2",
-#         "swi-verify-license_latest"
-#     ],
-#     "depends": [
-#         "swi-legato_latest",
-#         "swi-vscode-support_latest"
-#     ]
-# }
-#
-# "version" contains the release version identifier to be used for all leaf packages generated
-# by the build.
-#
-# "ref" contains the git ref to be checked out from the main mangOH repository (MANGOH_MAIN_REPO)
-# when fetching the mangOH source code.
-#
-# "wget" is an optional member, which directs the build to use wget to download
-# a list of files under the MANGOH_ROOT directory and optionally unpack them.
-# The "wget" member is an array of objects. Each of those objects must have a "url" member
-# and a "dir" member (which is a relative path from MANGOH_ROOT of a directory into which
-# the file will be downloaded. If an "unpack" member is present, it specifies the method to
-# be used to unpack the downloaded file. Presently, only "unzip" is supported.
-#
-# "requires" is a list of leaf packages to be added to the "requires" section of all generated
-# SDK master leaf packages.
-#
-# "depends" is a list of leaf packages to be added to the "depends" section of all generated
-# SDK master leaf packages.
-#
-# == legato ==
-#
-# Specifies the Legato source to fetch using Google's "repo" tool, as well as optional patches to
-# apply to the Legato source code before building it.
-#
-# "legato": {
-#     "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
-#     "base_manifest": "legato/releases/20.04.0/legato.xml",
-#     "patches": [
-#         {
-#             "purpose": "LE-14705: Fix SecStore to enable recovery from corrupted keys file.",
-#             "dir": ".",
-#             "cherry_pick": "f9cc1f29d4b36e9999d3365a2ecf85e358eb4efd"
-#         },
-#         {
-#             "purpose": "LE-14639: [Octave][CoAP]AV does not reply to CoAP retry on CoAP data for application",
-#             "dir": "3rdParty/Lwm2mCore/3rdParty/wakaama",
-#             "gerrit_review": {
-#                 "project": "external/eclipse/wakaama",
-#                 "patch_set": "63/60163/1"
-#             }
-#         }
-#     ]
-# }
-#
-# "manifest_repo" is a string containing the URL of the repo manifest repository.
-#
-# "base_manifest" is the path to the manifest XML file within the manifest repository.
-#
-# "patches" is an array of objects. All such objects must have a "dir" member containing a
-# the path to the directory under LEGATO_ROOT at which the patch should be applied.
-# The "purpose" member is an optional string used as a human-readable comment to document
-# the reason why the patch is being applied.
-#
-# In addition to "dir", all objects in the "patches" array must have either a "cherry_pick"
-# member or a "gerrit_review" member.
-#
-# The "cherry_pick" member is used when a fix is needed that has passed review and been submitted
-# to the Legato master, but that was not included in the version of Legato that is checked out
-# by the base manifest. This is typically needed to patch up known issues that have been fixed
-# but have not yet made it into a Legato release. If the "cherry_pick" member is used, it must
-# contain the git commit ID of a commit to be git cherry-picked into the HEAD from the same
-# repository.
-#
-# The "gerrit_review" member is used when the patch required has not yet even passed review in
-# Sierra Wireless's internal Gerrit instance. This is intended for emergency use only.
-# The "gerrit_review" member is an object with two members:
-#  - "project" specifies the Gerrit project name to fetch from within Sierra Wireless's internal
-#    Gerrit.
-#  - "patch_set" identifies the Gerrit patch set to fetch and cherry-pick.
-#
-# == octave ==
-#
-# "octave": {
-#     "ref": "BROOKLYN-2626_fix_makefile",
-#     "version": "3.0.0.pre03Jun2020-mangOH-1"
-# }
-#
-# Specifies the Octave Edge Package git repository ref to fetch and checkout when building Octave
-# into the release. Also specifies the version string that is to be reported to the Octave cloud
-# to ensure that the Octave cloud knows (and uses) the correct set of capabilities of the
-# device's Octave Edge Package apps.
-#
-# == boards ==
-#
-# Specifies all board + module combinations to be built for, and what component parts need to
-# be included in those builds.
-#
-# "boards": {
-#     "yellow": {
-#         "wp76xx": {
-#             "depends": [
-#                 "wp76-modem-image_13.3"
-#             ],
-#             "modem_firmware": "9999999_9908787_SWI9X07Y_02.28.03.05_00_SIERRA_001.032_000.spk",
-#             "yocto": {
-#                 "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
-#                 "base_manifest": "mdm9x28/tags/SWI9X07Y_02.37.07.00.xml",
-#                 "add": [
-#                     {
-#                         "url": "https://github.com/mangOH/meta-mangoh",
-#                         "ref": "mdev_update_for_ecm",
-#                         "dir": "meta-mangoh"
-#                     }
-#                 ]
-#             }
-#         },
-#         "wp77xx": {
-#            "depends": [
-#                "wp77-modem-image_12"
-#            ],
-#            "modem_firmware": "9999999_9908788_SWI9X06Y_02.32.02.00_00_SIERRA_001.027_000.spk",
-#             "yocto": {
-#                 "manifest_repo": "https://github.com/mangOH/manifest.git",
-#                 "base_manifest": "mangOH/releases/v0.6.0/wp77xx.xml"
-#             }
-#         }
-#     },
-#     "red": {
-#         "wp85": {
-#             "depends": [
-#                 "wp85-toolchain_SWI9X15Y_07.14.01.00-linux64",
-#                 "wp85-linux-image_SWI9X15Y_07.14.01.00",
-#                 "wp85-modem-image_17"
-#             ],
-#             "modem_firmware": "9999999_9904559_SWI9X15Y_07.14.01.00_00_GENERIC_001.042_000.spk"
-#         }
-#     }
-# }
-#
-# "boards" is an object in which each member it an object that represents a single board, such
-# as "red" or "yellow". The name of the member is the name of the board, and the value of the
-# member is an object whose members represent modules, such as Sierra Wireless WP76xx.
-#
-# The name of the module member must be the legato build "target" name, such as "wp85" or "wp76xx".
-#
-# All modules must have a "depends" member, which is a list of all the leaf packages to be
-# installed in the workspace when building for this module on this board. These leaf packages
-# will also be added to the "depends" list within the mangOH SDK master leaf package for this
-# particular board + module combination.
-#
-#     "depends": [
-#         "wp85-toolchain_SWI9X15Y_07.14.01.00-linux64",
-#         "wp85-linux-image_SWI9X15Y_07.14.01.00",
-#         "wp85-modem-image_17"
-#     ],
-#
-# The "modem_firmware" member specifies the name of the modem firmware SPK file from which
-# the modem firmware files will be extracted for inclusion in the final release SPK file.
-#
-#     "modem_firmware": "9999999_9908787_SWI9X07Y_02.28.03.05_00_SIERRA_001.032_000.spk",
-#
-# A "yocto" member can (optionally) be added when a custom Yocto linux distribution must be
-# built for this module on this board.  It specifies the Gerrit manifest repository URL and
-# the path to the manifest XML file within that repository that is to be used to fetch the
-# Yocto sources.
-#
-#     "yocto": {
-#         "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
-#         "base_manifest": "mdm9x28/tags/SWI9X07Y_02.37.07.00.xml",
-#         "add": [
-#             {
-#                 "url": "https://github.com/mangOH/meta-mangoh",
-#                 "ref": "mdev_update_for_ecm",
-#                 "dir": "meta-mangoh"
-#             }
-#         ]
-#     }
-# }
-#
-# The "add" member within the "yocto" object is optional. It can be used to specify a list
-# of other Git repositories that need to be cloned and checked out into the Yocto source tree
-# before it is built. The "dir" path is relative to the root of the Yocto source tree.
-#
 # Copyright (C) Sierra Wireless Inc.
 
 import sys
@@ -255,6 +53,9 @@ DHUB_ROOT = f"{MANGOH_ROOT}/apps/DataHub"
 # Repository URLs.
 MANGOH_MAIN_REPO = "https://github.com/mangOH/mangOH"
 
+# The mangOH release version identifier, taken from the release specification file name.
+version = None
+
 
 def yocto_build_dir(board, module):
     return f"{BUILD_DIR}/yocto-{board}-{module}"
@@ -264,19 +65,19 @@ def legato_build_dir(board, module):
     return f"{BUILD_DIR}/legato-{board}-{module}"
 
 
-def toolchain_package_id(board, module, version):
+def toolchain_package_id(board, module):
     return f"mangOH-{board}-{module}-toolchain_{version}-linux64"
 
 
-def linux_package_id(board, module, version):
+def linux_package_id(board, module):
     return f"mangOH-{board}-{module}-linux-image_{version}"
 
 
-def legato_package_id(board, module, version):
+def legato_package_id(board, module):
     return f"mangOH-{board}-{module}-legato_{version}"
 
 
-def octave_package_id(board, module, version):
+def octave_package_id(board, module):
     return f"Octave-mangOH-{board}-{module}_{version}"
 
 
@@ -389,12 +190,11 @@ def get_depends(spec, board, module):
     """
     mangoh_spec = spec["mangoh"]
     module_spec = spec["boards"][board][module]
-    depends = mangoh_spec["depends"] + (module_spec.get("depends") or [])
+    depends = mangoh_spec["depends"] + module_spec.get("depends", [])
     yocto_spec = module_spec.get("yocto")
     if yocto_spec:
-        version = spec["mangoh"]["version"]
-        depends.append(toolchain_package_id(board, module, version))
-        depends.append(linux_package_id(board, module, version))
+        depends.append(toolchain_package_id(board, module))
+        depends.append(linux_package_id(board, module))
     return depends
 
 
@@ -428,7 +228,7 @@ def build_yocto(spec, board, module):
             # Checkpoint reached.
             pathlib.Path(checkpoint_file).touch()
 
-    def package_toolchain(board, module, version):
+    def package_toolchain(board, module):
         """Build the leaf package for a module's toolchain."""
         package_dir = f"{LEAF_STAGING_DIR}/{board}-{module}-toolchain"
         prep_clean_dir(package_dir)
@@ -440,9 +240,9 @@ def build_yocto(spec, board, module):
             "poky-swi-ext-glibc-x86_64-meta-toolchain-swi-armv7a-neon-toolchain-swi-*.sh")
         assert len(self_extracting_toolchain) is 1
         shutil.copy(self_extracting_toolchain[0], f"{package_dir}/toolChainExtractor.sh")
-        create_leaf_package(toolchain_package_id(board, module, version), package_dir)
+        create_leaf_package(toolchain_package_id(board, module), package_dir)
 
-    def package_linux(board, module, version):
+    def package_linux(board, module):
         """Build the leaf package for a linux distro .cwe (kernel, root file system, etc.)."""
         package_dir = f"{LEAF_STAGING_DIR}/{board}-{module}-linux"
         prep_clean_dir(package_dir)
@@ -451,12 +251,11 @@ def build_yocto(spec, board, module):
         shell(f"MANGOH_BOARD={board} VERSION={version} TARGET={module} ./replaceVars {manifest_file}")
         shutil.copy(f"{yocto_build_dir(board, module)}/build_bin/tmp/deploy/images/swi-mdm9x28-wp/yocto_{module}.4k.cwe",
                 f"{package_dir}/linux.cwe")
-        create_leaf_package(linux_package_id(board, module, version), package_dir)
+        create_leaf_package(linux_package_id(board, module), package_dir)
 
     yocto_spec = spec["boards"][board][module].get("yocto")
     if yocto_spec:
         build_dir = yocto_build_dir(board, module)
-        version = spec["mangoh"]["version"]
         # This can be slow, even when already built, so checkpoint it.
         checkpoint_file = f"{build_dir}/.built"
         if not os.path.exists(checkpoint_file):
@@ -466,8 +265,8 @@ def build_yocto(spec, board, module):
             #shell("USE_DOCKER=1 make toolchain_bin", cwd=build_dir)
             shell("make image_bin", cwd=build_dir)
             shell("make toolchain_bin", cwd=build_dir)
-            package_toolchain(board, module, version)
-            package_linux(board, module, version)
+            package_toolchain(board, module)
+            package_linux(board, module)
             # Checkpoint reached.
             pathlib.Path(checkpoint_file).touch()
 
@@ -519,8 +318,7 @@ def build_legato(spec, board, module):
         print(f"Building the Legato Framework for {module} on {board}...")
         # If there's a Legato leaf package for this board+module in the remote already,
         # remove it.
-        version = spec["mangoh"]["version"]
-        package_id = legato_package_id(board, module, version)
+        package_id = legato_package_id(board, module)
         remove_leaf_package(package_id)
         # Clean the legato directory, because it may have been built for the same target
         # already but with a different toolchain for a different module.
@@ -560,8 +358,7 @@ def build_octave(spec, board, module):
     """
     print(f"Building the Octave Edge Package for {module} on {board}...")
     # If there's an Octave leaf package for this board+module in the remote already, remove it.
-    version = spec["mangoh"]["version"]
-    package_id = octave_package_id(board, module, version)
+    package_id = octave_package_id(board, module)
     remove_leaf_package(package_id)
     # It seems that it is necessary to clean the brkedgepkg between each
     # build for a different module. I suspect that the build system for
@@ -569,7 +366,7 @@ def build_octave(spec, board, module):
     # certain artifacts when the toolchain is swapped out.
     force_clean_git_repo(OCTAVE_ROOT)
     depends = get_depends(spec, board, module)
-    depends.append(legato_package_id(board, module, version))
+    depends.append(legato_package_id(board, module))
     with LeafProfile(map(remove_latest, depends)):
         shell('leaf shell -c leaf profile', cwd=BUILD_DIR)
         shell('leaf shell -c leaf env', cwd=BUILD_DIR)
@@ -612,9 +409,7 @@ def build_mangoh(spec, board, module):
     Build the factory .spk files for both the Octave and non-Octave versions for a particular
     mangOH board and module. Generate the master leaf package and add it to the leaf remote.
     """
-    mangoh_spec = spec["mangoh"]
     module_spec = spec["boards"][board][module]
-    version = mangoh_spec["version"]
     module_abbreviation = get_abbreviated_module(module)
 
     def get_requires_list():
@@ -622,7 +417,7 @@ def build_mangoh(spec, board, module):
         Get a list of strings, each of which contains the ID of a leaf package that
         should be in the "requires" list of the master package.
         """
-        return mangoh_spec["requires"] + (module_spec.get("requires") or [])
+        return spec["mangoh"]["requires"] + module_spec.get("requires", [])
 
     def get_modem_firmware():
         """
@@ -658,7 +453,6 @@ def build_mangoh(spec, board, module):
 
     def package(depends, firmware_version):
         package_name = f"mangOH-{board}-{module}"
-        version = mangoh_spec["version"]
         package_id=f"{package_name}_{version}"
         print(f"Creating Leaf package '{package_id}'")
         staging_dir = f"{LEAF_STAGING_DIR}/{board}-{module}-master"
@@ -687,8 +481,8 @@ def build_mangoh(spec, board, module):
         create_leaf_package(package_id, staging_dir)
 
     depends = get_depends(spec, board, module)
-    depends.append(legato_package_id(board, module, version))
-    depends.append(octave_package_id(board, module, version))
+    depends.append(legato_package_id(board, module))
+    depends.append(octave_package_id(board, module))
     with LeafProfile(map(remove_latest, depends)):
         firmware_path, firmware_version = get_modem_firmware()
         build(firmware_path)
@@ -702,6 +496,13 @@ if __name__ == '__main__':
     spec = None
     with open(sys.argv[1]) as json_file:
         spec = json.load(json_file)
+
+    # Extract the release version from the specification file name.
+    filename = os.path.basename(sys.argv[1].strip())
+    assert filename.endswith('.json')
+    version = filename[:-5]
+    assert version
+    print(f"Building mangOH release version {version}...");
 
     # Prepare the build directory tree and the process environment.
     os.makedirs(BUILD_DIR, exist_ok = True)
