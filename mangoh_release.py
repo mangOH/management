@@ -317,13 +317,12 @@ def fetch_git_repo(url, ref, dest=None):
 def force_clean_git_repo(repo_path):
     """
     Recursively find all git repositories under repo_path and remove untracked files;
-    excluding the checkpoint files (".fetched" and ".*built" in the root of each repo's working
-    directory).
+    excluding the ".fetched" checkpoint file.
     """
     for directory, subdirs, files in os.walk(repo_path):
         if '.git' in subdirs or '.git' in files:
             print(f"cleaning: {directory}")
-            shell("git clean -xfd -e /.fetched -e /.*built", cwd=directory)
+            shell("git clean -xfd -e /.fetched", cwd=directory)
 
 
 def fetch_mangoh(spec):
@@ -383,6 +382,29 @@ class LeafProfile:
         shell("leaf profile delete profile", cwd=BUILD_DIR)
 
 
+def get_depends(spec, board, module):
+    """
+    Get a list of strings, each of which contains the ID of a leaf package that
+    the spec says a given board and module depends on.
+    """
+    mangoh_spec = spec["mangoh"]
+    module_spec = spec["boards"][board][module]
+    depends = mangoh_spec["depends"] + (module_spec.get("depends") or [])
+    yocto_spec = module_spec.get("yocto")
+    if yocto_spec:
+        version = spec["mangoh"]["version"]
+        depends.append(toolchain_package_id(board, module, version))
+        depends.append(linux_package_id(board, module, version))
+    return depends
+
+
+def remove_latest(s):
+    """Remove the '_latest' from the end of a string, if present."""
+    if s.endswith("_latest"):
+        s = s[:-7]
+    return s
+
+
 def build_yocto(spec, board, module):
     """
     Build a custom Yocto-based distro.
@@ -392,7 +414,8 @@ def build_yocto(spec, board, module):
     def fetch_yocto(yocto_spec, board, module):
         """Fetch the source code for the Yocto toolchain, if it hasn't already been fetched."""
         build_dir = yocto_build_dir(board, module)
-        # This can be very time consuming and requires a fast Internet connection, so checkpoint this.
+        # This can be very time consuming and requires a fast Internet connection,
+        # so checkpoint this.
         checkpoint_file = f"{build_dir}/.fetched"
         if not os.path.exists(checkpoint_file):
             print(f"Fetching Yocto sources for mangOH {board} with {module}...")
@@ -493,31 +516,30 @@ def build_legato(spec, board, module):
     """
     legato_spec = spec.get("legato")
     if legato_spec:
-        checkpoint_file = f"{LEGATO_REPO_ROOT}/.built"
-        if not os.path.exists(checkpoint_file):
-            print(f"Building the Legato Framework for {module} on {board}...")
-            # If there's a Legato leaf package for this board+module in the remote already,
-            # remove it.
-            version = spec["mangoh"]["version"]
-            package_id = legato_package_id(board, module, version)
-            remove_leaf_package(package_id)
-            # Before we can run the build, we need to set up the leaf workspace with a profile that
-            # contains all the required packages.
-            with LeafProfile([toolchain_package_id(board, module, version)]) as profile:
-                shell(f"leaf shell -c 'make {module}'", cwd=LEGATO_ROOT)
-                # Package as leaf package and add to remote.
-                legato_version = get_legato_version()
-                package_dir = f"{LEAF_STAGING_DIR}/{board}-{module}-legato"
-                if os.path.exists(package_dir):
-                    shutil.rmtree(package_dir)
-                shell(f"cp -r {LEGATO_ROOT} {package_dir}")
-                shutil.rmtree(f"{package_dir}/.git")
-                shutil.copy("legatoManifest.json", f"{package_dir}/manifest.json")
-                shell(f"MANGOH_BOARD={board} VERSION={version} TARGET={module} "
-                      f"LEGATO_VERSION={legato_version} ./replaceVars {package_dir}/manifest.json")
-                create_leaf_package(package_id, package_dir)
-            # Checkpoint reached.
-            pathlib.Path(checkpoint_file).touch()
+        print(f"Building the Legato Framework for {module} on {board}...")
+        # If there's a Legato leaf package for this board+module in the remote already,
+        # remove it.
+        version = spec["mangoh"]["version"]
+        package_id = legato_package_id(board, module, version)
+        remove_leaf_package(package_id)
+        # Clean the legato directory, because it may have been built for the same target
+        # already but with a different toolchain for a different module.
+        shell("make clean", cwd=LEGATO_ROOT)
+        # Before we can run the build, we need to set up the leaf workspace with a profile that
+        # contains all the required packages.
+        with LeafProfile(map(remove_latest, get_depends(spec, board, module))):
+            shell(f"leaf shell -c 'make {module}'", cwd=LEGATO_ROOT)
+            # Package as leaf package and add to remote.
+            legato_version = get_legato_version()
+            package_dir = f"{LEAF_STAGING_DIR}/{board}-{module}-legato"
+            if os.path.exists(package_dir):
+                shutil.rmtree(package_dir)
+            shell(f"cp -r {LEGATO_ROOT} {package_dir}")
+            shutil.rmtree(f"{package_dir}/.git")
+            shutil.copy("legatoManifest.json", f"{package_dir}/manifest.json")
+            shell(f"MANGOH_BOARD={board} VERSION={version} TARGET={module} "
+                  f"LEGATO_VERSION={legato_version} ./replaceVars {package_dir}/manifest.json")
+            create_leaf_package(package_id, package_dir)
 
 
 def fetch_octave(spec):
@@ -536,43 +558,35 @@ def build_octave(spec, board, module):
     """
     Build the Octave Edge Package apps and create a Leaf package containing them.
     """
-    checkpoint_file = f"{OCTAVE_ROOT}/.{board}-{module}-built"
-    if not os.path.exists(checkpoint_file):
-        print(f"Building the Octave Edge Package for {module} on {board}...")
-        # If there's an Octave leaf package for this board+module in the remote already, remove it.
-        version = spec["mangoh"]["version"]
-        package_id = octave_package_id(board, module, version)
-        remove_leaf_package(package_id)
-        # It seems that it is necessary to clean the brkedgepkg between each
-        # build for a different module. I suspect that the build system for
-        # jerryscript isn't smart enough to know that it needs to re-build
-        # certain artifacts when the toolchain is swapped out.
-        force_clean_git_repo(OCTAVE_ROOT)
-        # Re-create the source fetch checkpoint file, because we just removed it.
-        pathlib.Path(f"{OCTAVE_ROOT}/.fetched").touch()
-        packages = [
-            toolchain_package_id(board, module, version),
-            legato_package_id(board, module, version)
-        ]
-        with LeafProfile(packages) as profile:
-            shell('leaf profile -v', cwd=BUILD_DIR)
-            shell('leaf shell -c leaf env', cwd=BUILD_DIR)
-            cmd = (
-                f"leaf shell -c 'make MANGOH_ROOT={MANGOH_ROOT} DHUB_ROOT={DHUB_ROOT}"
-                f" MANGOH_BOARD={board} VERSION={version}'"
-            )
-            shell(cmd, cwd=OCTAVE_ROOT)
-        # The Octave build already creates the leaf packages, so they just need to be
-        # copied into remote.
-        shutil.copy(
-            f"{OCTAVE_ROOT}/build/Octave-mangOH-{board}-{module}.leaf",
-            f"{LEAF_REMOTE}/{package_id}.leaf")
-        shutil.copy(
-            f"{OCTAVE_ROOT}/build/Octave-mangOH-{board}-{module}.leaf.info",
-            f"{LEAF_REMOTE}/{package_id}.leaf.info")
-        index_leaf_remote()
-        # Checkpoint reached.
-        pathlib.Path(checkpoint_file).touch()
+    print(f"Building the Octave Edge Package for {module} on {board}...")
+    # If there's an Octave leaf package for this board+module in the remote already, remove it.
+    version = spec["mangoh"]["version"]
+    package_id = octave_package_id(board, module, version)
+    remove_leaf_package(package_id)
+    # It seems that it is necessary to clean the brkedgepkg between each
+    # build for a different module. I suspect that the build system for
+    # jerryscript isn't smart enough to know that it needs to re-build
+    # certain artifacts when the toolchain is swapped out.
+    force_clean_git_repo(OCTAVE_ROOT)
+    depends = get_depends(spec, board, module)
+    depends.append(legato_package_id(board, module, version))
+    with LeafProfile(map(remove_latest, depends)):
+        shell('leaf shell -c leaf profile', cwd=BUILD_DIR)
+        shell('leaf shell -c leaf env', cwd=BUILD_DIR)
+        cmd = (
+            f"leaf shell -c 'make MANGOH_ROOT={MANGOH_ROOT} DHUB_ROOT={DHUB_ROOT}"
+            f" MANGOH_BOARD={board} VERSION={version}'"
+        )
+        shell(cmd, cwd=OCTAVE_ROOT)
+    # The Octave build already creates the leaf packages, so they just need to be
+    # copied into remote.
+    shutil.copy(
+        f"{OCTAVE_ROOT}/build/Octave-mangOH-{board}-{module}.leaf",
+        f"{LEAF_REMOTE}/{package_id}.leaf")
+    shutil.copy(
+        f"{OCTAVE_ROOT}/build/Octave-mangOH-{board}-{module}.leaf.info",
+        f"{LEAF_REMOTE}/{package_id}.leaf.info")
+    index_leaf_remote()
 
 
 def fetch_mangoh(spec):
@@ -602,20 +616,6 @@ def build_mangoh(spec, board, module):
     module_spec = spec["boards"][board][module]
     version = mangoh_spec["version"]
     module_abbreviation = get_abbreviated_module(module)
-
-    def get_depends_list():
-        """
-        Get a list of strings, each of which contains the ID of a leaf package that
-        the build depends on.
-        """
-        depends = mangoh_spec["depends"] + (module_spec.get("depends") or [])
-        yocto_spec = module_spec.get("yocto")
-        if yocto_spec:
-            depends.append(toolchain_package_id(board, module, version))
-            depends.append(linux_package_id(board, module, version))
-        depends.append(legato_package_id(board, module, version))
-        depends.append(octave_package_id(board, module, version))
-        return depends
 
     def get_requires_list():
         """
@@ -648,7 +648,7 @@ def build_mangoh(spec, board, module):
         # With Octave
         shell(f"leaf shell -c '{make_cmd}'", cwd=MANGOH_ROOT)
         shutil.copy(f"{MANGOH_ROOT}/build/{board}_{module}.spk",
-                    f"{BUILD_DIR}/mangOH-{board}-{module}_{version}-Octave.spk")
+                    f"{BUILD_DIR}/mangOH-{board}-{module}_{version}-octave.spk")
         # Without Octave
         shell("make clean", cwd=MANGOH_ROOT)
         make_cmd = make_cmd + " OCTAVE=0"
@@ -686,12 +686,9 @@ def build_mangoh(spec, board, module):
         shell(cmd)
         create_leaf_package(package_id, staging_dir)
 
-    def remove_latest(s):
-        if s.endswith("_latest"):
-            s = s[:-7]
-        return s
-
-    depends = get_depends_list()
+    depends = get_depends(spec, board, module)
+    depends.append(legato_package_id(board, module, version))
+    depends.append(octave_package_id(board, module, version))
     with LeafProfile(map(remove_latest, depends)):
         firmware_path, firmware_version = get_modem_firmware()
         build(firmware_path)
