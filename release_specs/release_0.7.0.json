@@ -1,0 +1,147 @@
+{
+    "mangoh": {
+        "version": "0.7.0-beta01",
+        "ref": "646592902e6d5d748560a60da7e3db0c0f57b360",
+        "wget": [
+            {
+                "url": "https://community.bosch-sensortec.com/varuj77995/attachments/varuj77995/bst_community-mems-forum/44/1/BSEC_1.4.7.2_GCC_CortexA7_20190225.zip",
+                "dir": "components/boschBsec",
+                "unpack": "unzip"
+            }
+        ],
+        "requires": [
+            "swi-license_1.2",
+            "swi-verify-license_latest"
+        ],
+        "depends": [
+            "swi-legato_latest",
+            "swi-vscode-support_latest"
+        ]
+    },
+
+    "legato": {
+        "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+        "base_manifest": "legato/releases/20.04.0/legato.xml",
+        "patches": [
+            {
+                "purpose": "LE-14705: Fix SecStore to enable recovery from corrupted keys file.",
+                "dir": ".",
+                "cherry_pick": "f9cc1f29d4b36e9999d3365a2ecf85e358eb4efd"
+            },
+            {
+                "purpose": "LE-14705: Fix SecStore to enable recovery from corrupted keys file.",
+                "dir": "platformAdaptor/trustZone/swi",
+                "cherry_pick": "824561dee5591c4c11366bca5153ba0c291376d8"
+            },
+            {
+                "purpose": "LE-14509: [AVC] Incorrect fd closure order during disconnection from the AV server",
+                "dir": "apps/platformServices/airVantageConnector",
+                "cherry_pick": "3998b243fb0426e3ae667d3e7dd3d535b3b4154a"
+            },
+            {
+                "purpose": "LE-14639: [Octave][CoAP]AV does not reply to CoAP retry on CoAP data for application",
+                "dir": "3rdParty/Lwm2mCore",
+                "gerrit_review": {
+                    "project": "lwm2mCore",
+                    "patch_set": "62/60162/2"
+                }
+            },
+            {
+                "purpose": "LE-14639: [Octave][CoAP]AV does not reply to CoAP retry on CoAP data for application",
+                "dir": "3rdParty/Lwm2mCore/3rdParty/wakaama",
+                "gerrit_review": {
+                    "project": "external/eclipse/wakaama",
+                    "patch_set": "63/60163/1"
+                }
+            },
+            {
+                "purpose": "LE-14672: [AVC][LwM2M] Server initiated is not working",
+                "dir": "3rdParty/Lwm2mCore",
+                "gerrit_review": {
+                    "project": "lwm2mCore",
+                    "patch_set": "38/60738/3"
+                }
+            },
+            {
+                "purpose": "LE-14672: [AVC][LwM2M] Server initiated is not working",
+                "dir": "3rdParty/Lwm2mCore/3rdParty/tinydtls",
+                "gerrit_review": {
+                    "project": "external/eclipse/tinydtls",
+                    "patch_set": "39/60739/2"
+                }
+            }
+        ]
+    },
+
+    "octave": {
+        "ref": "7d23612ac507f10a47a9d9f3bf4c954cfe4b48da",
+        "version": "3.0.0.pre03Jun2020-mangOH-1"
+    },
+
+    "boards": {
+        "yellow": {
+            "wp76xx": {
+                "depends": [
+                    "wp76-modem-image_13.3"
+                ],
+                "modem_firmware": "9999999_9908787_SWI9X07Y_02.28.03.05_00_SIERRA_001.032_000.spk",
+                "yocto": {
+                    "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+                    "base_manifest": "mdm9x28/tags/SWI9X07Y_02.37.07.00.xml",
+                    "add": [
+                        {
+                            "url": "https://github.com/mangOH/meta-mangoh",
+                            "ref": "mdev_update_for_ecm",
+                            "dir": "meta-mangoh"
+                        }
+                    ]
+                }
+            },
+            "wp77xx": {
+                "depends": [
+                    "wp77-modem-image_12"
+                ],
+                "modem_firmware": "9999999_9908788_SWI9X06Y_02.32.02.00_00_SIERRA_001.027_000.spk",
+                "yocto": {
+                    "manifest_repo": "https://github.com/mangOH/manifest.git",
+                    "base_manifest": "mangOH/releases/v0.6.0/wp77xx.xml"
+                }
+            }
+        },
+
+        "red": {
+            "wp85": {
+                "depends": [
+                    "wp85-toolchain_SWI9X15Y_07.14.01.00-linux64",
+                    "wp85-linux-image_SWI9X15Y_07.14.01.00",
+                    "wp85-modem-image_17"
+                ],
+                "modem_firmware": "9999999_9904559_SWI9X15Y_07.14.01.00_00_GENERIC_001.042_000.spk"
+            },
+            "wp750x": {
+                "depends": [
+                    "wp75-toolchain_SWI9X15Y_07.14.01.00-linux64",
+                    "wp75-linux-image_SWI9X15Y_07.14.01.00",
+                    "wp75-modem-image_17"
+                ],
+                "modem_firmware": "9999999_9904559_SWI9X15Y_07.14.01.00_00_GENERIC_001.042_000.spk"
+            },
+            "wp76xx": {
+                "depends": [
+                    "wp76-toolchain_SWI9X07Y_02.28.03.05-linux64",
+                    "wp76-linux-image_SWI9X07Y_02.28.03.05",
+                    "wp76-modem-image_13.3"
+                ],
+                "modem_firmware": "9999999_9908787_SWI9X07Y_02.28.03.05_00_SIERRA_001.032_000.spk"
+            },
+            "wp77xx": {
+                "depends": [
+                    "wp77-toolchain_SWI9X06Y_02.32.02.00-linux64",
+                    "wp77-linux-image_SWI9X06Y_02.32.02.00",
+                    "wp77-modem-image_12"
+                ],
+                "modem_firmware": "9999999_9908788_SWI9X06Y_02.32.02.00_00_SIERRA_001.027_000.spk"
+            }
+        }
+    }
+}

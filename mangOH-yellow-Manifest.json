@@ -14,14 +14,14 @@
             "mangOH-%MANGOH_BOARD%-%TARGET%-toolchain_%VERSION%-linux64(LEAF_PLATFORM_MACHINE=x86_64)(!SWI_LINUX_SRC)",
             "mangOH-%TARGET%-legato_%VERSION%",
             "mangOH-%MANGOH_BOARD%-%TARGET%-linux-image_%VERSION%",
-            "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_%OCTAVE_VERSION%",
+            "Octave-mangOH-%MANGOH_BOARD%-%TARGET%_%VERSION%",
             "%MODEM_LEAF_PACKAGE%",
             "swi-legato_latest"
         ],
         "tags": [
             "mangOH",
             "%MANGOH_BOARD%",
-            "wp77xx",
+            "%TARGET%",
             "Octave"
         ],
         "leafMinVersion": "2.0.1"
