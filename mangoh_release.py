@@ -411,6 +411,7 @@ def build_mangoh(spec, board, module):
     """
     module_spec = spec["boards"][board][module]
     module_abbreviation = get_abbreviated_module(module)
+    staging_dir = f"{LEAF_STAGING_DIR}/{board}-{module}-master"
 
     def get_requires_list():
         """
@@ -443,19 +444,18 @@ def build_mangoh(spec, board, module):
         # With Octave
         shell(f"leaf shell -c '{make_cmd}'", cwd=MANGOH_ROOT)
         shutil.copy(f"{MANGOH_ROOT}/build/{board}_{module}.spk",
-                    f"{BUILD_DIR}/mangOH-{board}-{module}_{version}-octave.spk")
+                    f"{staging_dir}/mangOH-{board}-{module}_{version}-octave.spk")
         # Without Octave
         shell("make clean", cwd=MANGOH_ROOT)
         make_cmd = make_cmd + " OCTAVE=0"
         shell(f"leaf shell -c '{make_cmd}'", cwd=MANGOH_ROOT)
         shutil.copy(f"{MANGOH_ROOT}/build/{board}_{module}.spk",
-                    f"{BUILD_DIR}/mangOH-{board}-{module}_{version}.spk")
+                    f"{staging_dir}/mangOH-{board}-{module}_{version}.spk")
 
     def package(depends, firmware_version):
         package_name = f"mangOH-{board}-{module}"
         package_id=f"{package_name}_{version}"
         print(f"Creating Leaf package '{package_id}'")
-        staging_dir = f"{LEAF_STAGING_DIR}/{board}-{module}-master"
         prep_clean_dir(staging_dir)
         octave_version = spec["octave"]["version"]
         legato_version = get_legato_version()
