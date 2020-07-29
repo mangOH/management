@@ -94,9 +94,9 @@ def sandbox_leaf():
     os.environ["LEAF_USER_ROOT"] = LEAF_USER_ROOT
 
 
-def shell(cmd, cwd=None):
+def shell(cmd, cwd=None, check=True):
     """Run a shell command. Throw an exception if it fails."""
-    subprocess.run(cmd, check=True, shell=True, cwd=cwd)
+    subprocess.run(cmd, check=check, shell=True, cwd=cwd)
 
 
 def fetch_git_repo(url, ref, dest=None):
@@ -365,6 +365,7 @@ def build_octave(spec, board, module):
     # jerryscript isn't smart enough to know that it needs to re-build
     # certain artifacts when the toolchain is swapped out.
     force_clean_git_repo(OCTAVE_ROOT)
+    shell("make clean", cwd=OCTAVE_ROOT)
     depends = get_depends(spec, board, module)
     depends.append(legato_package_id(board, module))
     with LeafProfile(map(remove_latest, depends)):
@@ -435,6 +436,7 @@ def build_mangoh(spec, board, module):
         return path, release
 
     def build(firmware_path):
+        shell("make clean", cwd=MANGOH_ROOT)
         make_cmd = (
             f"make {board}_spk "
             f"LEGATO_TARGET={module} "
@@ -456,7 +458,6 @@ def build_mangoh(spec, board, module):
         package_name = f"mangOH-{board}-{module}"
         package_id=f"{package_name}_{version}"
         print(f"Creating Leaf package '{package_id}'")
-        prep_clean_dir(staging_dir)
         octave_version = spec["octave"]["version"]
         legato_version = get_legato_version()
         description = (
@@ -480,6 +481,7 @@ def build_mangoh(spec, board, module):
         shell(cmd)
         create_leaf_package(package_id, staging_dir)
 
+    prep_clean_dir(staging_dir)
     depends = get_depends(spec, board, module)
     depends.append(legato_package_id(board, module))
     depends.append(octave_package_id(board, module))
@@ -510,7 +512,7 @@ if __name__ == '__main__':
 
     # Add a local file system directory as a leaf remote into which we will place leaf
     # packages as we create them.
-    subprocess.run("leaf remote remove local 2> /dev/null", shell=True, check=False)
+    shell("leaf remote remove local 2> /dev/null", check=False)
     shell(f"leaf remote add local file://{LEAF_REMOTE}/mangOH.json")
 
     # Fetch the Octave, Legato, and mangOH sources. These are common to all boards and modules.
@@ -529,3 +531,7 @@ if __name__ == '__main__':
             build_legato(spec, board, module)
             build_octave(spec, board, module)
             build_mangoh(spec, board, module)
+
+    print(f"==== RELEASE {version} BUILD COMPLETE ====")
+    print(f"The following leaf packages were generated in {LEAF_REMOTE}:")
+    shell(f"ls {LEAF_REMOTE} --ignore='*.json' --ignore='*.info'")
