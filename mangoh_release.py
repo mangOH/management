@@ -171,7 +171,7 @@ class LeafProfile:
     deleted on exit from the with block.
     """
     def __init__(self, base_packages):
-        self.packages = base_packages
+        self.packages = map(remove_latest, base_packages)
 
     def __enter__(self):
         shell("leaf remote fetch", cwd=BUILD_DIR)
@@ -325,7 +325,7 @@ def build_legato(spec, board, module):
         shell("make clean", cwd=LEGATO_ROOT)
         # Before we can run the build, we need to set up the leaf workspace with a profile that
         # contains all the required packages.
-        with LeafProfile(map(remove_latest, get_depends(spec, board, module))):
+        with LeafProfile(get_depends(spec, board, module)):
             shell(f"leaf shell -c 'make {module}'", cwd=LEGATO_ROOT)
             # Package as leaf package and add to remote.
             legato_version = get_legato_version()
@@ -368,7 +368,7 @@ def build_octave(spec, board, module):
     shell("make clean", cwd=OCTAVE_ROOT)
     depends = get_depends(spec, board, module)
     depends.append(legato_package_id(board, module))
-    with LeafProfile(map(remove_latest, depends)):
+    with LeafProfile(depends):
         shell('leaf shell -c leaf profile', cwd=BUILD_DIR)
         shell('leaf shell -c leaf env', cwd=BUILD_DIR)
         cmd = (
@@ -485,7 +485,7 @@ def build_mangoh(spec, board, module):
     depends = get_depends(spec, board, module)
     depends.append(legato_package_id(board, module))
     depends.append(octave_package_id(board, module))
-    with LeafProfile(map(remove_latest, depends)):
+    with LeafProfile(depends):
         firmware_path, firmware_version = get_modem_firmware()
         build(firmware_path)
         package(depends, firmware_version)
