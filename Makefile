@@ -26,7 +26,7 @@ INDEX_STAGING_DIR = $(BUILD_DIR)/leaf/staging/index
 # Builds the release.
 .PHONY: build
 build:
-	./mangoh_release.py release_specs/$@.json
+	./mangoh_release.py release_specs/$(RELEASE_VERSION).json
 
 # Download the entire existing mangOH leaf remote from Akamai, add the new release to it, and
 # re-generate the index.
