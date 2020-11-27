@@ -98,6 +98,9 @@ apply to the Legato source code before building it.
 
 "patches" is an array of objects. All such objects must have a "dir" member containing a
 the path to the directory under LEGATO_ROOT at which the patch should be applied.
+(When the patch is to be applied to LEGATO_ROOT, use "." or "" as the "dir" path, or omit
+the "dir" member altogether.)
+
 The "purpose" member is an optional string used as a human-readable comment to document
 the reason why the patch is being applied.
 

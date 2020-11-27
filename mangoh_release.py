@@ -275,6 +275,54 @@ def fetch_legato(spec):
     """
     Fetch and patch up the Legato sources in LEGATO_ROOT.
     """
+
+    def apply_patch(patch_spec):
+        """
+        Apply a patch to the Legato source tree, as specified in a member of the "patches" list.
+        """
+
+        def cherry_pick(path, cherry_pick_spec):
+            assert(isinstance(cherry_pick_spec, str))
+            shell(f"git cherry-pick {cherry_pick_spec}", cwd=path)
+
+        def apply_gerrit_changeset(path, gerrit_review_spec):
+            project = gerrit_review_spec.get("project")
+            if not isinstance(project, str):
+                raise TypeError("'project' is not a string in gerrit_review patch.")
+            patch_set = gerrit_review_spec.get("patch_set")
+            if not isinstance(patch_set, str):
+                raise TypeError("'patch_set' is not a string in gerrit_review patch.")
+            gerrit_user = os.environ.get("GERRIT_USER") or os.environ.get("USER")
+            if not gerrit_user:
+                raise ValueError("Unable to find user name in either GERRIT_USER or USER"
+                                 " environment variables.")
+            command = ( f'git fetch "ssh://{gerrit_user}@gerrit.legato:29418/{project}"'
+                        f' refs/changes/{patch_set}'
+                        f' && git cherry-pick FETCH_HEAD' )
+            shell(command, cwd=path)
+
+        # If "dir" is missing or empty, the patch should be applied directly to LEGATO_ROOT.
+        subdir = patch_spec.get("dir")
+        path = LEGATO_ROOT
+        if subdir not in [ None, "", "."]:
+            if not isinstance(subdir, str):
+                raise TypeError("dir is not a string")
+            path = f"{path}/{subdir}"
+        print(f"Applying patch to {path}")
+        print("Reason:", patch_spec.get("purpose"))
+        cherry_pick_spec = patch_spec.get("cherry_pick")
+        gerrit_review_spec = patch_spec.get("gerrit_review")
+        if cherry_pick_spec and gerrit_review_spec:
+            raise AssertionError("Both gerrit_review and cherry_pick used"
+                                 " in same patch specification.")
+        elif cherry_pick_spec:
+            cherry_pick(path, cherry_pick_spec)
+        elif gerrit_review_spec:
+            apply_gerrit_changeset(path, gerrit_review_spec)
+        else:
+            raise AssertionError("Neither gerrit_review nor cherry_pick found"
+                                 " in patch specification.")
+
     legato_spec = spec.get("legato")
     if legato_spec:
         # Fetching all Legato sources takes a while and requires a solid Internet connection,
@@ -287,6 +335,14 @@ def fetch_legato(spec):
             # Get the Legato sources
             shell(f"repo init -u {manifest_repo} -m {base_manifest} && repo sync",
                   cwd=LEGATO_REPO_ROOT)
+            # Patch it up.
+            patches = legato_spec.get("patches")
+            if not isinstance(patches, list):
+                raise TypeError("legato patches list is not a list")
+            for patch in patches:
+                if not isinstance(patch, dict):
+                    raise TypeError("legato patch list entry is not a JSON object")
+                apply_patch(patch)
             # Checkpoint reached.
             pathlib.Path(checkpoint_file).touch()
 
