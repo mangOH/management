@@ -296,7 +296,7 @@ def fetch_legato(spec):
             if not gerrit_user:
                 raise ValueError("Unable to find user name in either GERRIT_USER or USER"
                                  " environment variables.")
-            command = ( f'git fetch "ssh://{gerrit_user}@gerrit.legato:29418/{project}"'
+            command = ( f'git fetch "ssh://{gerrit_user}@master.gerrit.legato:29418/{project}"'
                         f' refs/changes/{patch_set}'
                         f' && git cherry-pick FETCH_HEAD' )
             shell(command, cwd=path)
