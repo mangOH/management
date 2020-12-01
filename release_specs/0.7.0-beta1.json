@@ -20,7 +20,7 @@
     },
 
     "legato": {
-        "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+        "manifest_repo": "ssh://${GERRIT_USER}@master.gerrit.legato:29418/manifest.git",
         "base_manifest": "legato/releases/20.04.0/legato.xml",
         "patches": [
             {
@@ -86,7 +86,7 @@
                 ],
                 "modem_firmware": "9999999_9908787_SWI9X07Y_02.37.03.00_00_SIERRA_001.060_000.spk",
                 "yocto": {
-                    "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+                    "manifest_repo": "ssh://${GERRIT_USER}@master.gerrit.legato:29418/manifest.git",
                     "base_manifest": "mdm9x28/tags/SWI9X07Y_02.37.07.00.xml",
                     "add": [
                         {

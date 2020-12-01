@@ -20,6 +20,13 @@ and test the packages.
 	cd mangOH
 	make yellow
 
+Gerrit User Name
+================
+
+Some operations require authenticated access to Gerrit. The value of the `GERRIT_USER` environment
+variable will be used to obtain the user name for access to Gerrit. If `GERRIT_USER` is not set,
+`mangoh_release.py` will set `GERRIT_USER` to the same value as `USER`.
+
 Specification File Format
 =========================
 
@@ -73,7 +80,7 @@ Specifies the Legato source to fetch using Google's "repo" tool, as well as opti
 apply to the Legato source code before building it.
 
 	"legato": {
-		"manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+		"manifest_repo": "ssh://${GERRIT_USER}@master.gerrit.legato:29418/manifest.git",
 		"base_manifest": "legato/releases/20.04.0/legato.xml",
 		"patches": [
 			{
@@ -92,7 +99,8 @@ apply to the Legato source code before building it.
 		]
 	}
 
-"manifest_repo" is a string containing the URL of the repo manifest repository.
+"manifest_repo" is a string containing the URL of the repo manifest repository. Environment
+variables can be used to add a Gerrit user name, for example.
 
 "base_manifest" is the path to the manifest XML file within the manifest repository.
 
@@ -115,7 +123,9 @@ contain the git commit ID of a commit to be git cherry-picked into the HEAD from
 repository.
 
 The "gerrit_review" member is used when the patch required has not yet even passed review in
-Sierra Wireless's internal Gerrit instance. This is intended for emergency use only.
+Sierra Wireless's internal Gerrit instance.This is intended for emergency use only. The
+value of the `GERRIT_USER` environment variable will be used as the Gerrit user name when
+fetching the patch.
 The "gerrit_review" member is an object with two members:
  - "project" specifies the Gerrit project name to fetch from within Sierra Wireless's internal
    Gerrit.
@@ -148,7 +158,7 @@ be included in those builds.
 				],
 				"modem_firmware": "9999999_9908787_SWI9X07Y_02.28.03.05_00_SIERRA_001.032_000.spk",
 				"yocto": {
-					"manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+					"manifest_repo": "ssh://${GERRIT_USER}@master.gerrit.legato:29418/manifest.git",
 					"base_manifest": "mdm9x28/tags/SWI9X07Y_02.37.07.00.xml",
 					"add": [
 						{
@@ -213,10 +223,11 @@ the modem firmware files will be extracted for inclusion in the final release SP
 A "yocto" member can (optionally) be added when a custom Yocto linux distribution must be
 built for this module on this board.  It specifies the Gerrit manifest repository URL and
 the path to the manifest XML file within that repository that is to be used to fetch the
-Yocto sources.
+Yocto sources. Environment variables can be used within the fields to, for example, add
+the appropriate user name for gerrit.
 
     "yocto": {
-        "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+        "manifest_repo": "ssh://${GERRIT_USER}@master.gerrit.legato:29418/manifest.git",
         "base_manifest": "mdm9x28/tags/SWI9X07Y_02.37.07.00.xml",
         "add": [
             {

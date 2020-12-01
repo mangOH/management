@@ -292,10 +292,6 @@ def fetch_legato(spec):
             patch_set = gerrit_review_spec.get("patch_set")
             if not isinstance(patch_set, str):
                 raise TypeError("'patch_set' is not a string in gerrit_review patch.")
-            gerrit_user = os.environ.get("GERRIT_USER") or os.environ.get("USER")
-            if not gerrit_user:
-                raise ValueError("Unable to find user name in either GERRIT_USER or USER"
-                                 " environment variables.")
             command = ( f'git fetch "ssh://{gerrit_user}@master.gerrit.legato:29418/{project}"'
                         f' refs/changes/{patch_set}'
                         f' && git cherry-pick FETCH_HEAD' )
@@ -565,6 +561,13 @@ if __name__ == '__main__':
     # Prepare the build directory tree and the process environment.
     os.makedirs(BUILD_DIR, exist_ok = True)
     sandbox_leaf()
+    gerrit_user = os.environ.get("GERRIT_USER")
+    if not gerrit_user:
+        gerrit_user = os.environ.get("USER")
+        if not gerrit_user:
+            raise ValueError("Unable to find user name in either GERRIT_USER or USER"
+                         " environment variables.")
+        os.environ["GERRIT_USER"] = gerrit_user
 
     # Add a local file system directory as a leaf remote into which we will place leaf
     # packages as we create them.
