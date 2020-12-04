@@ -1,7 +1,7 @@
 {
     "env": {
         "LEGATO_ROOT": "@{DIR}",
-        "LEGATO_TARGET": "${LEGATO_TARGET:-wp77xx}",
+        "LEGATO_TARGET": "${LEGATO_TARGET:-%TARGET%}",
         "PATH": "$LEGATO_ROOT/bin:$PATH",
         "LEGATO_LANGUAGE_SERVER": "$LEGATO_ROOT/bin/languageServer/languageServer.js",
         "LEGATO_SNIPPETS": "$LEGATO_ROOT/framework/snippets/vscode:$LEGATO_ROOT/framework/tools/mkTools/snippets/vscode:${LEGATO_SNIPPETS}"
@@ -9,9 +9,9 @@
     "install": [
     ],
     "info": {
-        "name": "mangOH-%TARGET%-legato",
+        "name": "mangOH-%MANGOH_BOARD%-%TARGET%-legato",
         "version": "%VERSION%",
-        "description": "Legato Framework built for mangOH and WP77 (%LEGATO_VERSION%)",
+        "description": "Legato Framework built for mangOH %MANGOH_BOARD% and %TARGET_UPPERCASE% (%LEGATO_VERSION%)",
         "requires": [
             "swi-license_1.2",
             "swi-verify-license_latest",
@@ -20,7 +20,7 @@
         ],
         "tags": [
             "mangOH",
-            "wp77xx"
+            "%TARGET%"
         ],
         "leafMinVersion": "2.0.1"
     }
