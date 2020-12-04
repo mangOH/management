@@ -421,11 +421,12 @@ def build_octave(spec, board, module):
     depends = get_depends(spec, board, module)
     depends.append(legato_package_id(board, module))
     with LeafProfile(depends):
+        octave_version = spec["octave"]["version"]
         shell('leaf shell -c leaf profile', cwd=BUILD_DIR)
         shell('leaf shell -c leaf env', cwd=BUILD_DIR)
         cmd = (
             f"leaf shell -c 'make MANGOH_ROOT={MANGOH_ROOT} DHUB_ROOT={DHUB_ROOT}"
-            f" MANGOH_BOARD={board} VERSION={version}'"
+            f" MANGOH_BOARD={board} VERSION={octave_version}'"
         )
         shell(cmd, cwd=OCTAVE_ROOT)
     # The Octave build already creates the leaf packages, so they just need to be
