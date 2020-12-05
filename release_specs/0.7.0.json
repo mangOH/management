@@ -1,0 +1,143 @@
+{
+    "mangoh": {
+        "version": "0.7.0",
+        "ref": "93ffe7df62970ad00c75bf547a6969b2d15cc086",
+        "wget": [
+            {
+                "url": "https://community.bosch-sensortec.com/varuj77995/attachments/varuj77995/bst_community-mems-forum/44/1/BSEC_1.4.7.2_GCC_CortexA7_20190225.zip",
+                "dir": "components/boschBsec",
+                "unpack": "unzip"
+            }
+        ],
+        "requires": [
+            "swi-license_1.2",
+            "swi-verify-license_latest"
+        ],
+        "depends": [
+            "swi-legato_latest",
+            "swi-vscode-support_latest"
+        ]
+    },
+
+    "legato": {
+        "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+        "base_manifest": "legato/releases/19.11.3/legato.xml",
+        "patches": [
+            {
+                "purpose": "LE-15536: AVC bs key rollback improvements",
+                "dir": "3rdParty/Lwm2mCore",
+                "cherry_pick": "e09035b6d92bfd1c1fd39afafe1dcf20b957ecc4"
+            },
+            {
+                "purpose": "LE-15536: AVC bs key rollback improvements",
+                "dir": "apps/platformServices/airVantageConnector",
+                "cherry_pick": "3489a85a8f092d7112416dcee5b00e13e9805109"
+            },
+            {
+                "purpose": "LE-15536: AVC bs key rollback improvements",
+                "dir": "platformAdaptor/trustZone/swi",
+                "cherry_pick": "5c5c7da6df446f6c72582b1425b195b5e520d3f6"
+            },
+
+            {
+                "purpose": "LE-15553: Resume handshake does not work",
+                "dir": "3rdParty/Lwm2mCore",
+                "cherry_pick": "1d4abbf598591eead563839dc160c8cca2f6ae14"
+            },
+            {
+                "purpose": "LE-15553: Resume handshake does not work",
+                "dir": "3rdParty/Lwm2mCore/3rdParty/tinydtls",
+                "cherry_pick": "8d516b2d4116a3b9481a24ca2ad26c1d1e629496"
+            },
+
+
+            {
+                "purpose": "LE-14946: Internal bindings don't work when app is built into a pre-built binary .app file",
+                "dir": "",
+                "gerrit_review": {
+                    "project": "Legato",
+                    "patch_set": "54/70054/3"
+                }
+            }
+        ]
+    },
+
+    "octave": {
+        "ref": "52b027580e1421e47a49c52cda9a09daf8bb5931",
+        "version": "3.1.0-mangOH-0"
+    },
+
+    "boards": {
+        "yellow": {
+            "wp76xx": {
+                "depends": [
+                    "wp76-modem-image_16"
+                ],
+                "modem_firmware": "9999999_9908787_SWI9X07Y_02.37.03.00_00_SIERRA_001.060_000.spk",
+                "yocto": {
+                    "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+                    "base_manifest": "products/wp76xx/releases/Release16.xml",
+                    "add": [
+                        {
+                            "url": "https://github.com/mangOH/meta-mangoh",
+                            "ref": "modules_dep_wifi_workaround",
+                            "dir": "meta-mangoh"
+                        }
+                    ]
+                }
+            },
+            "wp77xx": {
+                "depends": [
+                    "wp77-modem-image_13"
+                ],
+                "modem_firmware": "9999999_9908788_SWI9X06Y_02.35.02.00_00_SIERRA_001.036_001.spk",
+                "yocto": {
+                    "manifest_repo": "ssh://master.gerrit.legato:29418/manifest.git",
+                    "base_manifest": "products/wp77xx/releases/Release13.xml",
+                    "add": [
+                        {
+                            "url": "https://github.com/mangOH/meta-mangoh",
+                            "ref": "modules_dep_wifi_workaround",
+                            "dir": "meta-mangoh"
+                        }
+                    ]
+                }
+            }
+        },
+
+        "red": {
+            "wp85": {
+                "depends": [
+                    "wp85-toolchain_SWI9X15Y_07.14.01.00-linux64",
+                    "wp85-linux-image_SWI9X15Y_07.14.01.00",
+                    "wp85-modem-image_17"
+                ],
+                "modem_firmware": "9999999_9904559_SWI9X15Y_07.14.01.00_00_GENERIC_001.042_000.spk"
+            },
+            "wp750x": {
+                "depends": [
+                    "wp75-toolchain_SWI9X15Y_07.14.01.00-linux64",
+                    "wp75-linux-image_SWI9X15Y_07.14.01.00",
+                    "wp75-modem-image_17"
+                ],
+                "modem_firmware": "9999999_9904559_SWI9X15Y_07.14.01.00_00_GENERIC_001.042_000.spk"
+            },
+            "wp76xx": {
+                "depends": [
+                    "wp76-toolchain_SWI9X07Y_02.37.07.00-linux64",
+                    "wp76-linux-image_SWI9X07Y_02.37.07.00",
+                    "wp76-modem-image_16"
+                ],
+                "modem_firmware": "9999999_9908787_SWI9X07Y_02.37.03.00_00_SIERRA_001.060_000.spk"
+            },
+            "wp77xx": {
+                "depends": [
+                    "wp77-toolchain_SWI9X06Y_02.35.02.00-linux64",
+                    "wp77-linux-image_SWI9X06Y_02.35.02.00",
+                    "wp77-modem-image_13"
+                ],
+                "modem_firmware": "9999999_9908788_SWI9X06Y_02.35.02.00_00_SIERRA_001.036_001.spk"
+            }
+        }
+    }
+}
